@@ -10,6 +10,18 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+    logger.info('👋 Shutting down gracefully...');
+    process.exit(0);
+});
+
+// Plugin management API 
+process.on('SIGUSR1', async () => {
+    logger.info('🔄 Reloading plugins...');
+    await whatsappService.reloadPlugins();
+});
+
 // Middleware
 app.use(helmet());
 app.use(cors());

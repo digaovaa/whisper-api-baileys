@@ -20,7 +20,8 @@ const statusController = {
                     },
                     baileys: {
                         version: `${packageJson.dependencies.baileys}`,
-                        isServiceAlive: whatsappService.isServiceAlive()
+                        isServiceAlive: whatsappService.isServiceAlive(),
+                        plugins: whatsappService.getPluginStatus()
                     },
                     server: {
                         uptime: process.uptime(),

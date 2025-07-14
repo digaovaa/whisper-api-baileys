@@ -1,41 +1,40 @@
 const logger = require('../utils/logger');
 const packageJson = require('../../package.json');
 
-const antiGroupMention = async (sock, message) => {
-    // whitelist group jid 
-    let groupJids = ['120363399423653389@g.us', '120363025783457581@g.us'];
-    if (!Object.keys(message).includes('message')) return
-    if (Object.keys(message.message).includes('groupStatusMentionMessage')) {
-        let key = message.key;
-        let groupId = key.remoteJid;
-        let participant = key.participant;
-        let pushName = message.pushName || 'Anonim';
+const config = {
+    enabled: true
+};
 
-        if (groupJids.includes(groupId)) {
-            logger.warn(`⚠️Group lu di tag bang (${groupId}) sama si ${pushName}[${participant}]`)
-            logger.info('♻️ Otw kick ...')
+const antiMentionPlugin = async ({ props: { enabled = config.enabled, sock, message } }) => {
+    if (!enabled) return;
 
-            let textContent = `Cung yang kena spam *mention group* sama si dongo satu ini ☝️@${participant.split('@')[0]}`;
-            textContent += `\n\n> Sent via ${packageJson.name}\n> @${packageJson.author}/${packageJson.name}.git`;
+    const groupJids = ['120363399423653389@g.us', '120363025783457581@g.us'];
+    const groupMention = message?.message?.groupStatusMentionMessage;
 
-            // prepare bacotin dulu ga sih?
-            await sock.sendMessage(groupId, {
-                text: textContent,
-                mentions: [participant]
-            }, { quoted: message });
+    if (!groupMention) return;
 
-            // delete for everyone message annoying dia
-            await sock.sendMessage(groupId, { delete: key })
-             
-            // kick ae dah
-            setTimeout( async () => {
-                await sock.groupParticipantsUpdate(groupId, [participant], 'remove')
-                logger.info(`✅ Done kick pakcik si ${pushName}[${participant} dari grup (${groupId})`);
-            }, 10_000);
-        }
-    }
-}
+    const { key, pushName = 'Anonymous' } = message;
+    const { remoteJid: groupId, participant } = key;
 
-module.exports = { 
-    antiGroupMention
-}
+    if (!groupJids.includes(groupId)) return;
+
+    logger.warn(`⚠️ Group mentioned by ${pushName} [${participant}] in ${groupId}`);
+    logger.info(`♻️ Preparing to kick ...`);
+
+    const textContent = `Cung yang kena spam mention group sama si dongo satu ini ☝️ @${participant.split('@')[0]}\n\n> Sent via ${packageJson.name}\n> @${packageJson.author}/${packageJson.name}.git`;
+
+    await sock.sendMessage(groupId, {
+        text: textContent,
+        mentions: [participant],
+    }, { quoted: message });
+
+    await sock.sendMessage(groupId, { delete: key });
+
+    setTimeout(async () => {
+        await sock.groupParticipantsUpdate(groupId, [participant], 'remove');
+        logger.info(`✅ ${pushName} [${participant}] has been kicked from ${groupId}`);
+    }, 10_000);
+};
+
+module.exports = antiMentionPlugin;
+module.exports.config = config;

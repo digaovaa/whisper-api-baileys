@@ -8,9 +8,8 @@ const qrcode = require('qrcode-terminal');
 const logger = require('../utils/logger');
 const path = require('path');
 const packageJson = require('../../package.json');
-
-// import plugins syncronously
-const { antiGroupMention } = require('../plugins/anti-mention.plugin')
+const PluginManager = require('../core/plugin-manager.core')
+require('dotenv').config();
 
 class WhatsAppService {
     constructor() {
@@ -19,6 +18,7 @@ class WhatsAppService {
         this.connectionStatus = 'disconnected';
         this.qrCode = null;
         this.authDir = path.join(__dirname, '../../auth');
+        this.pluginManager = new PluginManager();
     }
 
     async initialize() {
@@ -30,6 +30,9 @@ class WhatsAppService {
             if (!fs.existsSync(this.authDir)) {
                 fs.mkdirSync(this.authDir, { recursive: true });
             }
+
+            // Initialize plugin manager
+            await this.pluginManager.loadPlugins();
 
             const { state, saveCreds } = await useMultiFileAuthState(this.authDir);
             const { version, isLatest } = await fetchLatestBaileysVersion();
@@ -88,16 +91,50 @@ class WhatsAppService {
 
         this.sock.ev.on('creds.update', saveCreds);
 
-        this.sock.ev.on('messages.upsert', (m) => {
-            const messages = m.messages;
-            if (messages && messages.length > 0) {
-                let message = messages[0];
-                antiGroupMention(this.sock, message);
-                console.info('Received messages: ', JSON.stringify(message, 2, null))
+        this.sock.ev.on('messages.upsert', this.handleMessagesUpsert.bind(this));
+        this.sock.ev.on('group-participants.update', this.handleGroupUpdate.bind(this));
+    }
 
-                logger.debug('📨 Received messages:', messages.length);
+    async handleGroupUpdate(update) {
+        const { id, participants, action } = update;
+        const message = { message: { groupUpdate: { participants, action } }, key: { remoteJid: id } };
+
+        try {
+            logger.info(`👥 Group participant update for ${id}: ${action}`);
+            await this.pluginManager.executePlugins(this.sock, message);
+        } catch (error) {
+            logger.error(`Error processing group participant update: ${error.message}`);
+        }
+    }
+
+    async handleMessagesUpsert(messageUpdate) {
+        const { messages, type } = messageUpdate;
+
+        if (type !== 'notify') return;
+
+        for (const message of messages) {
+            // debug mode 
+            if (process.env.DEBUG == 'true') console.log('Received message: ', JSON.stringify(message, 2, null)); 
+
+            // Skip messages from self
+            if (message.key.fromMe) continue;
+
+            try {
+                logger.info(`📨 Processing message from ${message.pushName || 'Unknown'}`);
+                // Execute all plugins
+                await this.pluginManager.executePlugins(this.sock, message);
+            } catch (error) {
+                logger.error(`Error processing message: ${error.message}`);
             }
-        });
+        }
+    }
+
+    async reloadPlugins() {
+        await this.pluginManager.reloadPlugins();
+    }
+
+    getPluginStatus() {
+        return this.pluginManager.getPluginStatus();
     }
 
     async sendMessage(phoneNumber, message) {

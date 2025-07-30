@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Whisper API Sandbox Cleanup every 10 minutes
+Requires=sandbox-cleanup.service
+
+[Timer]
+OnCalendar=*:0/10
+Persistent=true
+
+[Install]
+WantedBy=timers.target

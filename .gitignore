@@ -102,3 +102,12 @@ typings/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+*.csv
+*.py
+
+/src/generated/prisma
+
+*broken.*
+*backup.*
+*old.*

@@ -1,0 +1,274 @@
+### Multi-Instance WhatsApp API Endpoints
+### Available when WHATSAPP_MODE=multi or WHATSAPP_MODE=both
+### Base URL: http://localhost:3000/api/v1
+
+#####################
+### INSTANCE MANAGEMENT
+#####################
+
+###
+# Get All WhatsApp Instances
+GET http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+###
+# Create New WhatsApp Instance
+POST http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+{
+  "phone": "628123456789",
+  "name": "Test Instance 1",
+  "alias": "test-instance-1"
+}
+
+###
+# Get Specific Instance by Phone
+GET http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+###
+# Update Instance Information
+PUT http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+{
+  "name": "Updated Instance Name",
+  "alias": "updated-alias"
+}
+
+###
+# Delete Instance (Use with caution)
+DELETE http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+###
+# Restart Instance Connection
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/restart
+Content-Type: application/json
+
+###
+# Get QR Code for Instance Authentication
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/qr
+Content-Type: application/json
+
+#####################
+### INSTANCE-SPECIFIC MONITORING
+#####################
+
+###
+# Ping Specific Instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/ping
+Content-Type: application/json
+
+###
+# Get Instance Status
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/status
+Content-Type: application/json
+
+###
+# Get Instance Logs - All Logs
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/logs
+Content-Type: application/json
+
+###
+# Get Instance Logs - With Pagination
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/logs?limit=50&skip=0
+Content-Type: application/json
+
+###
+# Get Instance Logs - Filter by Level (info, warn, error, debug)
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/logs?level=error&limit=100
+Content-Type: application/json
+
+###
+# Get Instance Logs - With Date Range
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/logs?startDate=2024-01-01T00:00:00.000Z&endDate=2024-12-31T23:59:59.999Z
+Content-Type: application/json
+
+#####################
+### INSTANCE-SPECIFIC MESSAGING
+#####################
+
+###
+# Send Message from Specific Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-message
+Content-Type: application/json
+
+{
+  "to": "6282299265151",
+  "message": "Hello from Instance!"
+}
+
+###
+# Send Group Message from Specific Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-group-message
+Content-Type: application/json
+
+{
+  "groupId": "120363042123456789@g.us",
+  "message": "Hello group from Instance!"
+}
+
+###
+# Send Media Message from Instance - Image
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-media
+Content-Type: application/json
+
+{
+  "to": "6282299265151",
+  "media": {
+    "type": "image",
+    "url": "https://picsum.photos/400/300",
+    "caption": "Test image from instance API"
+  }
+}
+
+###
+# Send Video Media from Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-media
+Content-Type: application/json
+
+{
+  "to": "6282299265151",
+  "media": {
+    "type": "video",
+    "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+    "caption": "Test video from instance API"
+  }
+}
+
+###
+# Send Document Media from Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-media
+Content-Type: application/json
+
+{
+  "to": "628111222333",
+  "media": {
+    "type": "document",
+    "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    "filename": "test-document.pdf",
+    "caption": "Test document from instance API"
+  }
+}
+
+###
+# Send Audio Media from Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-media
+Content-Type: application/json
+
+{
+  "to": "628111222333",
+  "media": {
+    "type": "audio",
+    "url": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+  }
+}
+
+#####################
+### INSTANCE-SPECIFIC WEBHOOKS
+#####################
+
+###
+# Get All Webhooks for Instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks
+Content-Type: application/json
+
+###
+# Create Webhook for Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks
+Content-Type: application/json
+
+{
+  "type": "http",
+  "event": "message.received",
+  "url": "https://your-webhook-endpoint.com/webhook"
+}
+
+###
+# Get Specific Webhook by ID
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}
+Content-Type: application/json
+
+###
+# Update Webhook
+PUT http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}
+Content-Type: application/json
+
+{
+  "url": "https://new-webhook-endpoint.com/webhook",
+  "isEnabled": false
+}
+
+###
+# Toggle Webhook Status
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}/toggle
+Content-Type: application/json
+
+{
+  "isEnabled": true
+}
+
+###
+# Delete Webhook
+DELETE http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}
+Content-Type: application/json
+
+#####################
+### ERROR TEST CASES
+#####################
+
+###
+# Create Instance - Missing Required Fields
+POST http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+{
+  "phone": "628123456789"
+  # Missing required "name" field
+}
+
+###
+# Create Instance - Duplicate Phone Number
+POST http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+{
+  "phone": "628123456789",
+  "name": "Duplicate Instance",
+  "alias": "duplicate-test"
+}
+
+###
+# Get Non-existent Instance
+GET http://localhost:3000/api/v1/instances/628999999999
+Content-Type: application/json
+
+###
+# Send Message from Non-existent Instance
+POST http://localhost:3000/api/v1/instances/628999999999/send-message
+Content-Type: application/json
+
+{
+  "to": "628111222333",
+  "message": "This should fail - instance doesn't exist"
+}
+
+###
+# Send Message - Missing Required Fields
+POST http://localhost:3000/api/v1/instances/628123456789/send-message
+Content-Type: application/json
+
+{
+  "message": "Missing 'to' field"
+}
+
+###
+# Send Group Message - Missing Required Fields
+POST http://localhost:3000/api/v1/instances/628123456789/send-group-message
+Content-Type: application/json
+
+{
+  "message": "Missing 'groupId' field"
+}

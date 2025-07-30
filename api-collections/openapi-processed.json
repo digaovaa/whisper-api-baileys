@@ -1,0 +1,2142 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Whisper - WhatsApp API",
+    "description": "Complete API collection for WhatsApp management and messaging with configurable operational modes. Available modes: single (legacy only), multi (multi-instance only), both (hybrid mode).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://your-domain.com",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "🌐 Global Endpoints",
+      "description": "Global endpoints available in all operational modes"
+    },
+    {
+      "name": "🔀 Single Instance (Legacy)",
+      "description": "Legacy endpoints for single WhatsApp instance operation. Available when WHATSAPP_MODE=single or WHATSAPP_MODE=both"
+    },
+    {
+      "name": "🔀 Single Instance (Legacy) > System Monitoring"
+    },
+    {
+      "name": "🔀 Single Instance (Legacy) > Messaging"
+    },
+    {
+      "name": "🏢 Multi-Instance Management",
+      "description": "Modern multi-instance WhatsApp API endpoints with /instances prefix. Available when WHATSAPP_MODE=multi or WHATSAPP_MODE=both"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Instance Management"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Instance Monitoring"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Text Messaging"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Media Messaging"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Webhook Management"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Webhook History"
+    },
+    {
+      "name": "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+    }
+  ],
+  "paths": {
+    "/api/v1/mode": {
+      "get": {
+        "tags": [
+          "🌐 Global Endpoints"
+        ],
+        "summary": "Get Mode Information",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ping": {
+      "get": {
+        "tags": [
+          "🔀 Single Instance (Legacy) > System Monitoring"
+        ],
+        "summary": "Ping - Health Check",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "tags": [
+          "🔀 Single Instance (Legacy) > System Monitoring"
+        ],
+        "summary": "Status Check",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/logs": {
+      "get": {
+        "tags": [
+          "🔀 Single Instance (Legacy) > System Monitoring"
+        ],
+        "summary": "Get System Logs",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "50"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/message": {
+      "post": {
+        "tags": [
+          "🔀 Single Instance (Legacy) > Messaging"
+        ],
+        "summary": "Send Personal Message",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "phoneNumber": "6282299265151",
+                  "message": "Hello! This is a test message from WhatsApp API."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/message/group": {
+      "post": {
+        "tags": [
+          "🔀 Single Instance (Legacy) > Messaging"
+        ],
+        "summary": "Send Group Message",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "groupId": "120363042123456789@g.us",
+                  "message": "Hello group! This is a test message from WhatsApp API."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Get All Instances",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Create New Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "phone": "628123456789",
+                  "name": "Test Instance",
+                  "alias": "test-alias"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Get Instance by Phone",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Update Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "name": "Updated Instance Name",
+                  "alias": "updated-alias"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Delete Instance",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/restart": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Restart Instance",
+        "requestBody": {
+          "content": {}
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/qr": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Management"
+        ],
+        "summary": "Get QR Code",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/ping": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Monitoring"
+        ],
+        "summary": "Ping Instance",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/status": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Monitoring"
+        ],
+        "summary": "Get Instance Status",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/logs": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Instance Monitoring"
+        ],
+        "summary": "Get Instance Logs - Combined Filters",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "info"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "25"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "0"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "example": "2024-07-01T00:00:00.000Z"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/send-message": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Text Messaging"
+        ],
+        "summary": "Send Message from Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "to": "628987654321",
+                  "message": "Hello from multi-instance WhatsApp API!"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/send-group-message": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Text Messaging"
+        ],
+        "summary": "Send Group Message from Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "groupId": "120363042123456789@g.us",
+                  "message": "Hello group from multi-instance WhatsApp API!"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/send-media": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Media Messaging"
+        ],
+        "summary": "Send Audio Media from Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "to": "628987654321",
+                  "media": {
+                    "type": "audio",
+                    "url": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Get All Webhooks for Instance",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Create Webhook for Instance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "type": "http",
+                  "event": "message.received",
+                  "url": "https://your-webhook-endpoint.com/webhook"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/{webhook_id}": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Get Specific Webhook by ID",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Update Webhook",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "url": "https://new-webhook-endpoint.com/webhook",
+                  "isEnabled": false
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Delete Webhook",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/{webhook_id}/toggle": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook Management"
+        ],
+        "summary": "Toggle Webhook Status",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "isEnabled": true
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/history": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook History"
+        ],
+        "summary": "Get Instance Webhook History",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "50"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "1"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/history/stats": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook History"
+        ],
+        "summary": "Get Instance Webhook History Statistics",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/history/failures": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook History"
+        ],
+        "summary": "Get Instance Webhook History Failures",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instances/{phone_number}/webhooks/{webhook_id}/history": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Webhook History"
+        ],
+        "summary": "Get Specific Webhook History",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "phone_number",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Global Webhook History",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "100"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/stats": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Global Webhook History Statistics",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/failures": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Global Webhook History Failures",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/events/message.received": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Webhook History by Event Type",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/statuses/success": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Webhook History by Status",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/{history_id}": {
+      "get": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Get Webhook History by ID",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          },
+          {
+            "name": "history_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhooks/history/cleanup": {
+      "post": {
+        "tags": [
+          "🏢 Multi-Instance Management > Global Webhook History (Admin)"
+        ],
+        "summary": "Cleanup Old Webhook History",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "daysOld": 30
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Indicates if the request was successful",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message about the result",
+                      "example": "Operation completed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Response data object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

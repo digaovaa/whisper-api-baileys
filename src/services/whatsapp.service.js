@@ -8,7 +8,7 @@ const qrcode = require('qrcode-terminal');
 const logger = require('../utils/logger');
 const path = require('path');
 const packageJson = require('../../package.json');
-const PluginManager = require('../core/plugin-manager.core')
+const PluginManager = require('../core/plugin-manager.core');
 require('dotenv').config();
 
 class WhatsAppService {
@@ -19,6 +19,7 @@ class WhatsAppService {
         this.qrCode = null;
         this.authDir = path.join(__dirname, '../../auth');
         this.pluginManager = new PluginManager();
+        this.groupMetadataCache = new Map();
     }
 
     async initialize() {
@@ -43,7 +44,23 @@ class WhatsAppService {
                 version,
                 auth: state,
                 printQRInTerminal: false,
-                logger: logger
+                logger: logger,
+                cachedGroupMetadata: async (jid) => {
+                    // Check if metadata exists in the cache 
+                    if (this.groupMetadataCache.has(jid)) {
+                        return this.groupMetadataCache.get(jid);
+                    } 
+
+                    try {
+                        // Fetch metadata if not in cache 
+                        const metadata = await this.sock.groupMetadata(jid); 
+                        this.groupMetadataCache.set(jid, metadata); // Cache it 
+                        return metadata;
+                    } catch (error) {
+                        logger.error(`Error getting group meta data of ${jid} : ${error.message}`);
+                        return null;
+                    }
+                }
             });
 
             this.setupEventHandlers(saveCreds);
@@ -113,9 +130,6 @@ class WhatsAppService {
         if (type !== 'notify') return;
 
         for (const message of messages) {
-            // debug mode 
-            if (process.env.DEBUG == 'true') console.log('Received message: ', JSON.stringify(message, 2, null)); 
-
             // Skip messages from self
             if (message.key.fromMe) continue;
 

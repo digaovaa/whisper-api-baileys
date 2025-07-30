@@ -1,0 +1,98 @@
+### Single Instance (Legacy) WhatsApp API Endpoints
+### Available when WHATSAPP_MODE=single or WHATSAPP_MODE=both
+### Base URL: http://localhost:3000/api/v1
+
+#####################
+### SYSTEM MONITORING
+#####################
+
+###
+# Ping/Pong - Health Check
+GET http://localhost:3000/api/v1/ping
+Content-Type: application/json
+
+###
+# Status Check
+GET http://localhost:3000/api/v1/status
+Content-Type: application/json
+
+###
+# Get System Logs - All Logs
+GET http://localhost:3000/api/v1/logs
+Content-Type: application/json
+
+###
+# Get System Logs - With Limit
+GET http://localhost:3000/api/v1/logs?limit=50
+Content-Type: application/json
+
+###
+# Get Error Logs Only
+GET http://localhost:3000/api/v1/logs?level=error&limit=100
+Content-Type: application/json
+
+###
+# Get Info Logs Only
+GET http://localhost:3000/api/v1/logs?level=info&limit=100
+Content-Type: application/json
+
+#####################
+### MESSAGING
+#####################
+
+###
+# Send Personal Message
+POST http://localhost:3000/api/v1/message
+Content-Type: application/json
+
+{
+  "phoneNumber": "6282299265151",
+  "message": "Hello! This is a test message from WhatsApp API."
+}
+
+###
+# Send Group Message
+POST http://localhost:3000/api/v1/message/group
+Content-Type: application/json
+
+{
+  "groupId": "120363042123456789@g.us",
+  "message": "Hello group! This is a test message from WhatsApp API."
+}
+
+#####################
+### ERROR TEST CASES
+#####################
+
+###
+# Send Message - Missing phoneNumber
+POST http://localhost:3000/api/v1/message
+Content-Type: application/json
+
+{
+  "message": "Hello! This should fail."
+}
+
+###
+# Send Message - Empty message
+POST http://localhost:3000/api/v1/message
+Content-Type: application/json
+
+{
+  "phoneNumber": "628123456789",
+  "message": ""
+}
+
+###
+# Send Group Message - Missing groupId
+POST http://localhost:3000/api/v1/message/group
+Content-Type: application/json
+
+{
+  "message": "Hello group! This should fail."
+}
+
+###
+# Invalid Route Test
+GET http://localhost:3000/api/v1/invalid-route
+Content-Type: application/json

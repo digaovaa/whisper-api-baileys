@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper API - Seamless WhatsApp Integration</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Seamlessly integrate WhatsApp into your applications with Whisper API. Features real-time monitoring, multi-instance management, webhook support, and RESTful endpoints for automated messaging.">
+    <meta name="keywords" content="WhatsApp API, messaging integration, automated messaging, multi-instance WhatsApp, webhook, RESTful API, Express.js, Baileys, MongoDB">
+    <meta name="author" content="Whisper API">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://whisper-api.example.com/">
+    <meta property="og:title" content="Whisper API - Seamless WhatsApp Integration">
+    <meta property="og:description" content="Seamlessly integrate WhatsApp into your applications with Whisper API. Features real-time monitoring, multi-instance management, and automated messaging capabilities.">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://whisper-api.example.com/">
+    <meta property="twitter:title" content="Whisper API - Seamless WhatsApp Integration">
+    <meta property="twitter:description" content="Seamlessly integrate WhatsApp into your applications with Whisper API. Features real-time monitoring, multi-instance management, and automated messaging capabilities.">
+    <meta property="twitter:image" content="/og-image.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://whisper-api.example.com/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Whisper API",
+      "description": "Seamlessly integrate WhatsApp into your applications with Whisper API. Features real-time monitoring, multi-instance management, webhook support, and RESTful endpoints for automated messaging.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Cross-platform",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Whisper API"
+      },
+      "programmingLanguage": "JavaScript",
+      "runtimePlatform": "Node.js",
+      "codeRepository": "https://github.com/ibnusyawall/whisper-api"
+    }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom CSS for multi-line code blocks */
+        .code-block {
+            white-space: pre-line;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* Alternative approach using pre-wrap for better text wrapping */
+        .code-block-wrap {
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.5;
+            overflow-x: auto;
+            word-break: break-all;
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 4rem 2rem;
+            border-top: 4px solid #4f46e5;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .footer h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .footer-links li a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .social-link:hover {
+            color: white;
+        }
+
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-badge {
+            background-color: #374151;
+            color: #d1d5db;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom a {
+            color: white;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: #d1d5db;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.0/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.10/dist/clipboard.min.js"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl sm:text-2xl font-bold text-indigo-600">Whisper API</h1>
+            <nav class="hidden sm:block">
+                <ul class="flex space-x-4 lg:space-x-6 text-sm font-medium">
+                    <li><a href="#features" class="hover:text-indigo-600">Features</a></li>
+                    <li><a href="#how-it-works" class="hover:text-indigo-600">How It Works</a></li>
+                    <li><a href="#setup" class="hover:text-indigo-600">Setup</a></li>
+                    <li><a href="/docs" class="hover:text-indigo-600">Docs</a></li>
+                    <li><a href="/docs-api" class="hover:text-indigo-600">API Docs</a></li>
+                    <li><a href="/try-api" class="hover:text-indigo-600 bg-indigo-100 px-3 py-1 rounded-md">Try API</a></li>
+                    <li><a href="#contact" class="hover:text-indigo-600">Contact</a></li>
+                </ul>
+            </nav>
+            <!-- Mobile menu button -->
+            <button class="sm:hidden p-2" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white border-t">
+            <ul class="px-4 py-2 space-y-2 text-sm font-medium">
+                <li><a href="#features" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">Features</a></li>
+                <li><a href="#how-it-works" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">How It Works</a></li>
+                <li><a href="#setup" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">Setup</a></li>
+                <li><a href="/docs" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">Docs</a></li>
+                <li><a href="/docs-api" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">API Docs</a></li>
+                <li><a href="/try-api" class="block py-2 hover:text-indigo-600 bg-indigo-100 px-3 rounded-md" onclick="closeMobileMenu()">Try API</a></li>
+                <li><a href="#contact" class="block py-2 hover:text-indigo-600" onclick="closeMobileMenu()">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section id="hero" class="bg-gradient-to-br from-indigo-50 to-white py-12 sm:py-20 text-center relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 leading-tight mb-6">Seamless WhatsApp Integration</h2>
+            <div id="intro-text" class="text-lg sm:text-xl text-gray-600 min-h-[1.5rem] sm:min-h-[1.75rem] mb-8"></div>
+            <div class="mt-6 sm:mt-10 animate-bounce">
+                <svg class="w-6 h-6 mx-auto text-indigo-400" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24" aria-label="Scroll down arrow">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="bg-gray-50 rounded-lg p-6 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition">
+                    <h4 class="text-xl font-semibold mb-2">Ping/Pong Health Check</h4>
+                    <p class="text-gray-600">Easily monitor server health and WhatsApp connection.</p>
+                </div>
+                <div
+                    class="bg-gray-50 rounded-lg p-6 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition">
+                    <h4 class="text-xl font-semibold mb-2">Status Monitoring</h4>
+                    <p class="text-gray-600">Real-time insights into your WhatsApp connection status.</p>
+                </div>
+                <div
+                    class="bg-gray-50 rounded-lg p-6 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition">
+                    <h4 class="text-xl font-semibold mb-2">Multi-Instance Management</h4>
+                    <p class="text-gray-600">Handle multiple WhatsApp instances concurrently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-16 bg-gray-100">
+        <div class="max-w-6xl mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">How It Works</h3>
+
+            <!-- Architecture Overview -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
+                <h4 class="text-2xl font-semibold mb-6 text-center">Architecture Overview</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-blue-100 p-4 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h5 class="font-semibold text-gray-800">Express.js API</h5>
+                        <p class="text-sm text-gray-600">RESTful endpoints</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-green-100 p-4 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h5 class="font-semibold text-gray-800">Baileys Library</h5>
+                        <p class="text-sm text-gray-600">WhatsApp integration</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-purple-100 p-4 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                                </path>
+                            </svg>
+                        </div>
+                        <h5 class="font-semibold text-gray-800">MongoDB</h5>
+                        <p class="text-sm text-gray-600">Instance management</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-orange-100 p-4 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h5 class="font-semibold text-gray-800">Webhooks</h5>
+                        <p class="text-sm text-gray-600">Real-time events</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Modes -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-3">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold">Single Instance</h4>
+                    </div>
+                    <p class="text-gray-600 mb-3">Perfect for basic WhatsApp messaging with one account.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Simple QR code authentication</li>
+                        <li>• Direct message sending</li>
+                        <li>• Lightweight setup</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-2 border-indigo-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-3">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold">Multi-Instance</h4>
+                        <span class="ml-2 bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Default</span>
+                    </div>
+                    <p class="text-gray-600 mb-3">Manage multiple WhatsApp accounts simultaneously.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Multiple concurrent sessions</li>
+                        <li>• Database-backed management</li>
+                        <li>• Advanced webhook support</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-3">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l3 3-3 3m13 0h-6m-2-5a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold">Hybrid Mode</h4>
+                    </div>
+                    <p class="text-gray-600 mb-3">Combine both single and multi-instance capabilities.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• All endpoints available</li>
+                        <li>• Maximum flexibility</li>
+                        <li>• Development-friendly</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Workflow Steps -->
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h4 class="text-2xl font-semibold mb-6 text-center">Integration Workflow</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div
+                            class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            1</div>
+                        <h5 class="font-semibold mb-2">Configure</h5>
+                        <p class="text-sm text-gray-600">Set up environment variables and choose operational mode</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            2</div>
+                        <h5 class="font-semibold mb-2">Authenticate</h5>
+                        <p class="text-sm text-gray-600">Scan QR code to connect WhatsApp account(s)</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            3</div>
+                        <h5 class="font-semibold mb-2">Integrate</h5>
+                        <p class="text-sm text-gray-600">Use RESTful APIs to send messages and manage instances</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                            4</div>
+                        <h5 class="font-semibold mb-2">Monitor</h5>
+                        <p class="text-sm text-gray-600">Receive real-time webhooks and monitor connection status</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup -->
+    <section id="setup" class="py-16 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6">
+            <h3 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Easy Setup</h3>
+            <ol class="list-decimal list-inside space-y-4 text-gray-700">
+                <li>
+                    <strong>Clone the repository:</strong>
+                    <div class="relative mt-1">
+                        <pre class="bg-gray-100 rounded p-2 pr-12 text-sm overflow-x-auto whitespace-nowrap">git clone https://github.com/ibnusyawall/whisper-api.git &amp;&amp; cd whisper-api</pre>
+                        <button
+                            class="copy-btn absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded text-xs hover:bg-indigo-600 transition"
+                            data-clipboard-text="git clone https://github.com/ibnusyawall/whisper-api.git && cd whisper-api">Copy</button>
+                    </div>
+                </li>
+                <li>
+                    <strong>Install dependencies:</strong>
+                    <div class="relative mt-1">
+                        <pre class="bg-gray-100 rounded p-2 pr-12 text-sm overflow-x-auto">npm install</pre>
+                        <button
+                            class="copy-btn absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded text-xs hover:bg-indigo-600 transition"
+                            data-clipboard-text="npm install">Copy</button>
+                    </div>
+                </li>
+                <li>
+                    <strong>Set up environment variables:</strong>
+                    <div class="relative mt-1">
+                        <pre class="bg-gray-100 rounded p-2 pr-12 text-sm overflow-x-auto">cp .env.example .env</pre>
+                        <button
+                            class="copy-btn absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded text-xs hover:bg-indigo-600 transition"
+                            data-clipboard-text="cp .env.example .env">Copy</button>
+                    </div>
+                </li>
+                <li>
+                    <strong>Configure your <code>.env</code> file with the required variables.</strong>
+                </li>
+                <li>
+                    <strong>Set up the database (MongoDB with Prisma):</strong>
+                    <div class="relative mt-1">
+                        <pre class="code-block bg-gray-100 rounded p-2 pr-12 text-sm overflow-x-auto">npx prisma generate
+npx prisma db push</pre>
+                        <button
+                            class="copy-btn absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded text-xs hover:bg-indigo-600 transition"
+                            data-clipboard-text="npx prisma generate&#10;npx prisma db push">Copy</button>
+                    </div>
+                </li>
+                <li>
+                    <strong>Start the server:</strong>
+                    <div class="relative mt-1">
+                        <pre class="code-block bg-gray-100 rounded p-2 pr-12 text-sm overflow-x-auto">npm run dev # Development
+npm start # Production</pre>
+                        <button
+                            class="copy-btn absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded text-xs hover:bg-indigo-600 transition"
+                            data-clipboard-text="npm run dev # Development&#10;npm start # Production">Copy</button>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <img src="/logo.svg" alt="Whisper API" class="footer-logo">
+                    <h3>Whisper API</h3>
+                    <p>A RESTful WhatsApp messaging API built with Express.js and Baileys library for seamless WhatsApp integration.</p>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/docs-api">API Collections</a></li>
+                    <li><a href="/try-api">Interactive API</a></li>
+                    <li><a href="#setup">Installation</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/ibnusyawall/whisper-api" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+                    <li><a href="https://github.com/ibnusyawall/whisper-api/issues" target="_blank" rel="noopener noreferrer">Report Issues</a></li>
+                    <li><a href="https://github.com/ibnusyawall/whisper-api/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
+                    <li><a href="https://github.com/WhiskeySockets/Baileys" target="_blank" rel="noopener noreferrer">Baileys Library</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="https://github.com/ibnusyawall" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://github.com/ibnusyawall/whisper-api" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <i class="fas fa-star"></i>
+                        <span>Star Project</span>
+                    </a>
+                </div>
+                
+                <div class="tech-badges">
+                    <span class="tech-badge">Node.js</span>
+                    <span class="tech-badge">Express.js</span>
+                    <span class="tech-badge">Baileys</span>
+                    <span class="tech-badge">MongoDB</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; 2025 Whisper API. Licensed under the <a href="https://github.com/ibnusyawall/whisper-api/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
+                <p class="footer-disclaimer">This project is for educational and development purposes. Please comply with WhatsApp's Terms of Service.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Wait for all resources to be fully loaded
+        window.addEventListener('load', function () {
+            // Initialize TypeIt if available
+            if (typeof TypeIt !== 'undefined') {
+                new TypeIt('#intro-text', {
+                    strings: ["Forge seamless conversations with your customers.", "Automate messaging tasks effortlessly."],
+                    speed: 50,
+                    loop: true
+                }).go();
+            }
+
+            // Initialize Lenis if available
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis();
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+            }
+
+            // Initialize clipboard.js - this is the most important part
+            if (typeof ClipboardJS !== 'undefined') {
+                const clipboard = new ClipboardJS('.copy-btn');
+
+                clipboard.on('success', function (e) {
+                    const button = e.trigger;
+                    const originalText = button.textContent;
+
+                    console.log('Copy successful:', e.text);
+
+                    // Change button text to 'Copied'
+                    button.textContent = 'Copied';
+                    button.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                    button.classList.add('bg-green-500', 'hover:bg-green-600');
+
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        button.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+                    }, 2000);
+
+                    e.clearSelection();
+                });
+
+                clipboard.on('error', function (e) {
+                    console.error('Copy failed:', e);
+                    const button = e.trigger;
+                    const originalText = button.textContent;
+
+                    // Change button text to 'Failed'
+                    button.textContent = 'Failed';
+                    button.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                    button.classList.add('bg-red-500', 'hover:bg-red-600');
+
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        button.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+                    }, 2000);
+                });
+
+                // Debug: Log all copy buttons found
+                const copyButtons = document.querySelectorAll('.copy-btn');
+                console.log('Found copy buttons:', copyButtons.length);
+                copyButtons.forEach((btn, index) => {
+                    console.log(`Button ${index + 1}:`, btn.getAttribute('data-clipboard-text'));
+                });
+            } else {
+                console.error('ClipboardJS not loaded!');
+            }
+        });
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

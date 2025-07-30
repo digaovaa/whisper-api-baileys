@@ -1,0 +1,204 @@
+### Webhook History API Endpoints
+### Available when WHATSAPP_MODE=multi or WHATSAPP_MODE=both
+### Base URL: http://localhost:3000/api/v1
+
+#####################
+### INSTANCE-SPECIFIC WEBHOOK HISTORY
+#####################
+
+###
+# Get webhook history for a specific instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history
+Content-Type: application/json
+
+###
+# Get webhook history with filters
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history?limit=20&skip=0&status=success&event=message.received
+Content-Type: application/json
+
+###
+# Get webhook history with date range
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history?startDate=2024-01-01T00:00:00.000Z&endDate=2024-12-31T23:59:59.999Z
+Content-Type: application/json
+
+###
+# Get webhook statistics for instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history/stats
+Content-Type: application/json
+
+###
+# Get webhook statistics with timeframe
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history/stats?timeframe=week
+Content-Type: application/json
+
+###
+# Get recent webhook failures for instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history/failures
+Content-Type: application/json
+
+###
+# Get recent failures with limit
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/history/failures?limit=5
+Content-Type: application/json
+
+###
+# Get history for specific webhook
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}/history
+Content-Type: application/json
+
+#####################
+### GLOBAL WEBHOOK HISTORY (Admin/Monitoring)
+#####################
+
+###
+# Get global webhook history (all instances)
+GET http://localhost:3000/api/v1/webhooks/history
+Content-Type: application/json
+
+###
+# Get global webhook history with filters
+GET http://localhost:3000/api/v1/webhooks/history?limit=50&skip=0&status=failed
+Content-Type: application/json
+
+###
+# Get global webhook statistics
+GET http://localhost:3000/api/v1/webhooks/history/stats
+Content-Type: application/json
+
+###
+# Get global statistics with timeframe
+GET http://localhost:3000/api/v1/webhooks/history/stats?timeframe=month
+Content-Type: application/json
+
+###
+# Get global recent failures
+GET http://localhost:3000/api/v1/webhooks/history/failures
+Content-Type: application/json
+
+###
+# Get webhook history by event type
+GET http://localhost:3000/api/v1/webhooks/history/events/message.received
+Content-Type: application/json
+
+###
+# Get webhook history by event with instance filter
+GET http://localhost:3000/api/v1/webhooks/history/events/connection.update?instanceId={{instance_id}}
+Content-Type: application/json
+
+###
+# Get webhook history by status
+GET http://localhost:3000/api/v1/webhooks/history/statuses/success
+Content-Type: application/json
+
+###
+# Get webhook history by status with instance filter
+GET http://localhost:3000/api/v1/webhooks/history/statuses/timeout?instanceId={{instance_id}}
+Content-Type: application/json
+
+###
+# Get specific webhook history record by ID
+GET http://localhost:3000/api/v1/webhooks/history/{{history_id}}
+Content-Type: application/json
+
+#####################
+### WEBHOOK HISTORY MAINTENANCE
+#####################
+
+###
+# Clean up old webhook history records (keep last 30 days)
+POST http://localhost:3000/api/v1/webhooks/history/cleanup
+Content-Type: application/json
+
+{
+  "daysToKeep": 30
+}
+
+###
+# Clean up old webhook history records (keep last 7 days)
+POST http://localhost:3000/api/v1/webhooks/history/cleanup
+Content-Type: application/json
+
+{
+  "daysToKeep": 7
+}
+
+#####################
+### EXAMPLE RESPONSES
+#####################
+
+### Webhook History Response Example:
+# {
+#   "success": true,
+#   "data": [
+#     {
+#       "id": "674a5e8b9c1d2e3f4a5b6c7d",
+#       "instanceId": "674a5e8b9c1d2e3f4a5b6c7e",
+#       "webhookId": "674a5e8b9c1d2e3f4a5b6c7f",
+#       "event": "message.received",
+#       "status": "success",
+#       "httpStatusCode": 200,
+#       "responseTime": 245,
+#       "payload": {
+#         "event": "message.received",
+#         "data": { ... },
+#         "timestamp": "2024-01-15T10:30:00.000Z",
+#         "instanceId": "674a5e8b9c1d2e3f4a5b6c7e"
+#       },
+#       "response": {
+#         "status": 200,
+#         "statusText": "OK",
+#         "data": { "received": true }
+#       },
+#       "triggeredAt": "2024-01-15T10:30:00.000Z",
+#       "completedAt": "2024-01-15T10:30:00.245Z",
+#       "instance": {
+#         "id": "674a5e8b9c1d2e3f4a5b6c7e",
+#         "phone": "628123456789",
+#         "name": "Test Instance"
+#       },
+#       "webhook": {
+#         "id": "674a5e8b9c1d2e3f4a5b6c7f",
+#         "url": "https://your-webhook.com/endpoint",
+#         "event": "message.received"
+#       }
+#     }
+#   ],
+#   "meta": {
+#     "count": 1,
+#     "limit": 50,
+#     "skip": 0
+#   }
+# }
+
+### Statistics Response Example:
+# {
+#   "success": true,
+#   "data": {
+#     "timeframe": "day",
+#     "period": {
+#       "since": "2024-01-14T10:30:00.000Z",
+#       "until": "2024-01-15T10:30:00.000Z"
+#     },
+#     "totals": {
+#       "triggers": 150,
+#       "successful": 142,
+#       "failed": 8,
+#       "successRate": 94.67
+#     },
+#     "performance": {
+#       "averageResponseTime": 325
+#     },
+#     "breakdown": {
+#       "byEvent": {
+#         "message.received": 85,
+#         "message.sent": 45,
+#         "connection.update": 20
+#       },
+#       "byStatus": {
+#         "success": 142,
+#         "failed": 6,
+#         "timeout": 2
+#       }
+#     }
+#   }
+# }

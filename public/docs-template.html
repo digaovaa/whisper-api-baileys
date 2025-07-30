@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper API Documentation</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Complete documentation for Whisper API - WhatsApp integration made simple with RESTful endpoints and multi-instance support.">
+    <meta name="keywords"
+        content="WhatsApp API documentation, messaging API, multi-instance WhatsApp, webhook integration">
+    <meta name="author" content="Whisper API">
+    <meta name="robots" content="index, follow">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #5a67d8, #6b46c1);
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 39;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100vh;
+            overflow-y: auto;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 40;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Main content styles */
+        .content {
+            margin-left: 320px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
+            background: #fafbfc;
+        }
+
+        .content.full-width {
+            margin-left: 0;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        /* Header styles */
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-header {
+                display: flex;
+                justify-content: between;
+                align-items: center;
+            }
+        }
+
+        /* Sidebar header */
+        .sidebar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+
+        /* Navigation styles */
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .nav-section:last-child {
+            border-bottom: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #f8fafc;
+            color: #3730a3;
+            border-left-color: #e0e7ff;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #e0e7ff, #f1f5ff);
+            color: #3730a3;
+            font-weight: 600;
+            border-left-color: #667eea;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Subnav styles */
+        .subnav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 2px solid transparent;
+            font-size: 0.875rem;
+        }
+
+        .subnav-item:hover {
+            background: #f8fafc;
+            color: #3730a3;
+            border-left-color: #d1d5db;
+        }
+
+        .subnav-item.active {
+            background: linear-gradient(90deg, #f0f4ff, #f8fafc);
+            color: #3730a3;
+            font-weight: 500;
+            border-left-color: #a78bfa;
+        }
+
+        .subnav-icon {
+            width: 16px;
+            margin-right: 8px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* Content styling */
+        .content-wrapper {
+            max-width: 4xl;
+            margin: 0 auto;
+            padding: 2rem 2.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .content-wrapper {
+                padding: 3rem 4rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .content-wrapper {
+                padding: 3rem 5rem;
+            }
+        }
+
+        .doc-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        .doc-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 12px 12px 0 0;
+        }
+
+        /* Typography */
+        .doc-title {
+            color: #1e293b;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .doc-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #1e293b;
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* Code blocks */
+        .code-container {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+
+        .code-header {
+            background: #2d3748;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre;
+            border: 1px solid #2d3748;
+            border-top: none;
+        }
+
+        /* Table styles */
+        .doc-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.5rem 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .doc-table th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .doc-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .doc-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Enhanced markdown content styling */
+        .content-wrapper {
+            max-width: 4xl;
+            line-height: 1.8;
+        }
+
+        /* Better spacing for content sections */
+        .content-wrapper > * {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Enhanced code block styling */
+        .code-container {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .code-block {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Copy button feedback */
+        .copy-btn.copied {
+            background: #10b981 !important;
+        }
+
+        .copy-btn.copied .fa-copy {
+            display: none;
+        }
+
+        /* .copy-btn.copied::after { */
+        /*     content: 'Copied!'; */
+        /* } */
+
+        /* Mobile responsive improvements */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 1rem;
+                max-width: 100%;
+            }
+            
+            .table-container {
+                font-size: 0.875rem;
+            }
+            
+            .code-container {
+                margin: 1rem 0;
+            }
+            
+            .code-block {
+                font-size: 0.75rem;
+                padding: 0.75rem;
+            }
+            
+            /* Better handling for long inline code */
+            code {
+                word-break: break-all;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        /* Table enhancements */
+        .table-container {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        /* Improved typography */
+        .content-wrapper h1:first-child {
+            margin-top: 0;
+        }
+
+        .content-wrapper h1, .content-wrapper h2, .content-wrapper h3 {
+            position: relative;
+        }
+
+        .content-wrapper h1:hover::after,
+        .content-wrapper h2:hover::after,
+        .content-wrapper h3:hover::after {
+            content: '#';
+            position: absolute;
+            left: -1.5rem;
+            color: #cbd5e1;
+            font-weight: normal;
+        }
+
+        /* List improvements */
+        /* .content-wrapper ul, .content-wrapper ol { */
+        /*     padding-left: 1.5rem; */
+        /* } */
+
+        .content-wrapper li {
+            margin: 0.5rem 0;
+        }
+
+        .content-wrapper li p {
+            margin: 0;
+        }
+
+        /* Link improvements */
+        .content-wrapper a:hover {
+            text-decoration: underline;
+        }
+
+        /* Badge-like inline code */
+        .content-wrapper code:not([class*="language-"]) {
+            font-weight: 600;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Blockquote improvements */
+        .content-wrapper blockquote {
+            position: relative;
+        }
+
+        .content-wrapper blockquote::before {
+            content: '\201C';
+            position: absolute;
+            top: -0.5rem;
+            left: -0.5rem;
+            font-size: 3rem;
+            color: #3b82f6;
+            opacity: 0.3;
+        }
+
+        /* Scroll behavior for anchor links */
+        html {
+            scroll-padding-top: 100px;
+        }
+
+        /* Comprehensive content-wrapper styling */
+        
+        /* Center aligned divs (for headers) */
+        .content-wrapper div[align="center"] {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        /* Typography - Headings */
+        .content-wrapper h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            margin-top: 2rem;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+        
+        .content-wrapper h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .content-wrapper h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+            color: #1f2937;
+        }
+        
+        .content-wrapper h4 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            color: #1f2937;
+        }
+        
+        .content-wrapper h5 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            margin-top: 0.75rem;
+            color: #1f2937;
+        }
+        
+        .content-wrapper h6 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            margin-top: 0.75rem;
+            color: #1f2937;
+        }
+        
+        /* Responsive heading adjustments */
+        @media (min-width: 768px) {
+            .content-wrapper h1 {
+                font-size: 3rem;
+            }
+            .content-wrapper h2 {
+                font-size: 2.25rem;
+            }
+            .content-wrapper h3 {
+                font-size: 1.875rem;
+            }
+            .content-wrapper h4 {
+                font-size: 1.5rem;
+            }
+            .content-wrapper h5 {
+                font-size: 1.25rem;
+            }
+            .content-wrapper h6 {
+                font-size: 1.125rem;
+            }
+        }
+        
+        /* Paragraphs */
+        .content-wrapper p {
+            color: #374151;
+            margin-bottom: 1rem;
+            line-height: 1.75;
+        }
+        
+        /* Lists */
+        .content-wrapper ul {
+            list-style-type: disc;
+            list-style-position: inside;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content-wrapper ol {
+            list-style-type: decimal;
+            list-style-position: inside;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content-wrapper li {
+            color: #374151;
+            line-height: 1.75;
+            margin: 0.5rem 0;
+        }
+        
+        .content-wrapper li p {
+            margin: 0;
+            display: inline;
+        }
+        
+        /* Nested lists */
+        .content-wrapper ul ul,
+        .content-wrapper ol ol,
+        .content-wrapper ul ol,
+        .content-wrapper ol ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Inline code */
+        .content-wrapper code:not([class*="language-"]) {
+            background-color: #f3f4f6;
+            color: #dc2626;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            word-break: break-words;
+            border: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
+        
+        /* Links */
+        .content-wrapper a {
+            color: #2563eb;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+            word-break: break-words;
+        }
+        
+        .content-wrapper a:hover {
+            color: #1d4ed8;
+        }
+        
+        /* Images */
+        .content-wrapper img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 1rem auto;
+            display: block;
+        }
+        
+        /* Blockquotes */
+        .content-wrapper blockquote {
+            border-left: 4px solid #3b82f6;
+            background-color: #eff6ff;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #374151;
+            position: relative;
+        }
+        
+        .content-wrapper blockquote::before {
+            content: '\201C';
+            position: absolute;
+            top: -0.5rem;
+            left: -0.5rem;
+            font-size: 3rem;
+            color: #3b82f6;
+            opacity: 0.3;
+        }
+        
+        /* Tables */
+        .content-wrapper .table-container {
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-wrapper table {
+            min-width: 100%;
+            background-color: white;
+            border-collapse: collapse;
+        }
+        
+        .content-wrapper thead {
+            background-color: #f9fafb;
+        }
+        
+        .content-wrapper tbody {
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .content-wrapper tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .content-wrapper th {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        
+        .content-wrapper td {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+            word-break: break-words;
+        }
+        
+        /* Responsive table adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper .table-container {
+                font-size: 0.875rem;
+            }
+            
+            .content-wrapper th,
+            .content-wrapper td {
+                padding: 0.75rem;
+            }
+        }
+        
+        /* Pre-formatted text blocks (non-code) */
+        .content-wrapper pre:not(.code-block) {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            white-space: pre;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+        
+        /* Enhanced responsive adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper pre:not(.code-block) {
+                padding: 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 4rem 2rem;
+            border-top: 4px solid #4f46e5;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        .footer h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .footer-links li a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .social-link:hover {
+            color: white;
+        }
+
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-badge {
+            background-color: #374151;
+            color: #d1d5db;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom a {
+            color: white;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: #a78bfa;
+        }
+
+        .footer-disclaimer {
+            color: #9ca3af;
+            max-width: 600px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .footer-bottom-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-disclaimer {
+                text-align: center;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Mobile Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="/logo.svg" alt="Whisper API" class="w-8 h-8 mr-3">
+                <h1 class="text-xl font-bold text-gray-800">Whisper API Docs</h1>
+            </div>
+            <button id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-indigo-600 focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+
+        <!-- Sidebar Overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center">
+                        <img src="/logo.svg" alt="Whisper API" class="w-10 h-10 mr-3">
+                        <div>
+                            <h2 class="text-xl font-bold">Whisper API</h2>
+                            <p class="text-sm opacity-80">Documentation</p>
+                        </div>
+                    </div>
+                    <button id="sidebar-close"
+                        class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg lg:hidden">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3 class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</h3>
+                <a href="#overview" class="nav-item active" data-section="overview">
+                    <i class="nav-icon fas fa-home"></i>
+                    <span>Overview</span>
+                </a>
+                <div id="overview-subnav" class="ml-4"></div>
+                <a href="#installation" class="nav-item" data-section="installation">
+                    <i class="nav-icon fas fa-download"></i>
+                    <span>API</span>
+                </a>
+            </div>
+
+
+            <div class="nav-section">
+                <h3 class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Resources</h3>
+                <a href="#troubleshooting" class="nav-item" data-section="troubleshooting">
+                    <i class="nav-icon fas fa-wrench"></i>
+                    <span>Troubleshooting</span>
+                </a>
+                <a href="#contributing" class="nav-item" data-section="contributing">
+                    <i class="nav-icon fas fa-hands-helping"></i>
+                    <span>Contributing</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <div id="content" class="content">
+        <div class="content-wrapper">
+            {{body}}
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <img src="/logo.svg" alt="Whisper API" class="footer-logo">
+                    <h3>Whisper API</h3>
+                    <p>A RESTful WhatsApp messaging API built with Express.js and Baileys library for seamless WhatsApp integration.</p>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/docs-api">API Collections</a></li>
+                    <li><a href="/try-api">Interactive API</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/ibnusyawall/whisper-api" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+                    <li><a href="https://github.com/ibnusyawall/whisper-api/issues" target="_blank" rel="noopener noreferrer">Report Issues</a></li>
+                    <li><a href="https://github.com/ibnusyawall/whisper-api/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a></li>
+                    <li><a href="https://github.com/WhiskeySockets/Baileys" target="_blank" rel="noopener noreferrer">Baileys Library</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="https://github.com/ibnusyawall" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://github.com/ibnusyawall/whisper-api" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <i class="fas fa-star"></i>
+                        <span>Star Project</span>
+                    </a>
+                </div>
+                
+                <div class="tech-badges">
+                    <span class="tech-badge">Node.js</span>
+                    <span class="tech-badge">Express.js</span>
+                    <span class="tech-badge">Baileys</span>
+                    <span class="tech-badge">MongoDB</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; 2025 Whisper API. Licensed under the <a href="https://github.com/ibnusyawall/whisper-api/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
+                <p class="footer-disclaimer">This project is for educational and development purposes. Please comply with WhatsApp's Terms of Service.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const content = document.getElementById('content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn?.addEventListener('click', toggleSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // Navigation active state
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.doc-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = item.getAttribute('data-section');
+                const targetElement = document.getElementById(targetSection);
+
+                if (targetElement) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+
+                    targetElement.scrollIntoView({behavior: 'smooth'});
+
+                    // Close sidebar on mobile after navigation
+                    if (window.innerWidth <= 1024) {
+                        closeSidebar();
+                    }
+                }
+            });
+        });
+
+        // Back to top button
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        backToTopBtn?.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // Loading animation
+        setTimeout(() => {
+            sections.forEach(section => {
+                section.classList.add('loading');
+            });
+        }, 100);
+
+        // Responsive sidebar handling
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                closeSidebar();
+            }
+        });
+
+        // Copy to clipboard functionality with modern Clipboard API
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (err) {
+                    console.warn('Clipboard API failed, falling back to execCommand');
+                }
+            }
+            
+            // Fallback for older browsers
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = text;
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.opacity = '0';
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+                return successful;
+            } catch (err) {
+                document.body.removeChild(tempTextarea);
+                return false;
+            }
+        }
+
+        // Set up copy functionality with event delegation
+        document.addEventListener('click', async (e) => {
+            // Check if clicked element is a copy button or its child
+            const button = e.target.closest('.copy-btn');
+            if (button) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Copy button clicked'); // Debug log
+                
+                const codeContainer = button.closest('.code-container');
+                if (!codeContainer) {
+                    console.error('Code container not found');
+                    return;
+                }
+                
+                const codeBlock = codeContainer.querySelector('.code-block code');
+                if (!codeBlock) {
+                    console.error('Code block not found');
+                    return;
+                }
+                
+                const textToCopy = codeBlock.textContent || codeBlock.innerText;
+                console.log('Text to copy:', textToCopy.substring(0, 50) + '...'); // Debug log
+
+                try {
+                    const success = await copyToClipboard(textToCopy);
+                    
+                    if (success) {
+                        // Visual feedback
+                        const originalHTML = button.innerHTML;
+                        button.classList.add('copied');
+                        button.innerHTML = '\u003ci class="fas fa-check mr-1"\u003e\u003c/i\u003eCopied!';
+                        button.style.background = '#10b981';
+                        
+                        console.log('Copy successful'); // Debug log
+
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            button.classList.remove('copied');
+                            button.innerHTML = originalHTML;
+                            button.style.background = '';
+                        }, 2000);
+                    } else {
+                        // Error feedback
+                        const originalHTML = button.innerHTML;
+                        button.innerHTML = '\u003ci class="fas fa-exclamation mr-1"\u003e\u003c/i\u003eFailed';
+                        button.style.background = '#ef4444';
+                        
+                        console.log('Copy failed'); // Debug log
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalHTML;
+                            button.style.background = '';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Copy error:', error);
+                }
+            }
+        });
+
+        // Enhanced navigation with automatic section detection
+        function updateActiveNavigation() {
+            const sections = document.querySelectorAll('h1[id], h2[id], h3[id]');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            let currentSection = '';
+            const scrollPosition = window.scrollY + 120;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPosition) {
+                    currentSection = section.id;
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === currentSection) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Update navigation on scroll
+        window.addEventListener('scroll', updateActiveNavigationWithSubnav);
+
+        // Function to populate overview subnav dynamically
+        function populateOverviewSubnav() {
+            const overviewSubnav = document.getElementById('overview-subnav');
+            const headings = document.querySelectorAll('.content-wrapper h2[id], .content-wrapper h3[id]');
+            
+            if (!overviewSubnav || headings.length === 0) return;
+            
+            // Clear existing subnav
+            overviewSubnav.innerHTML = '';
+            
+            headings.forEach(heading => {
+                const id = heading.id;
+                const text = heading.textContent;
+                const level = heading.tagName.toLowerCase();
+                
+                // Skip if no ID or text
+                if (!id || !text) return;
+                
+                // Create subnav item
+                const subnavItem = document.createElement('a');
+                subnavItem.href = `#${id}`;
+                subnavItem.className = 'subnav-item';
+                subnavItem.setAttribute('data-section', id);
+                
+                // Add icon based on heading level
+                const icon = document.createElement('i');
+                icon.className = level === 'h2' ? 'subnav-icon fas fa-circle' : 'subnav-icon fas fa-dot-circle';
+                
+                const span = document.createElement('span');
+                span.textContent = text;
+                
+                subnavItem.appendChild(icon);
+                subnavItem.appendChild(span);
+                
+                // Add click handler
+                subnavItem.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.getElementById(id);
+                    if (target) {
+                        // Remove active from all nav items
+                        document.querySelectorAll('.nav-item, .subnav-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        
+                        // Add active to clicked item and parent overview
+                        this.classList.add('active');
+                        document.querySelector('[data-section="overview"]').classList.add('active');
+                        
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        
+                        // Close sidebar on mobile
+                        if (window.innerWidth <= 1024) {
+                            closeSidebar();
+                        }
+                    }
+                });
+                
+                overviewSubnav.appendChild(subnavItem);
+            });
+        }
+        
+        // Enhanced navigation with subnav support
+        function updateActiveNavigationWithSubnav() {
+            const sections = document.querySelectorAll('h1[id], h2[id], h3[id]');
+            const navItems = document.querySelectorAll('.nav-item');
+            const subnavItems = document.querySelectorAll('.subnav-item');
+            
+            let currentSection = '';
+            const scrollPosition = window.scrollY + 120;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPosition) {
+                    currentSection = section.id;
+                }
+            });
+
+            // Clear all active states
+            navItems.forEach(item => item.classList.remove('active'));
+            subnavItems.forEach(item => item.classList.remove('active'));
+            
+            // Check if current section matches any subnav item
+            const activeSubnav = document.querySelector(`.subnav-item[data-section="${currentSection}"]`);
+            if (activeSubnav) {
+                activeSubnav.classList.add('active');
+                document.querySelector('[data-section="overview"]').classList.add('active');
+            } else {
+                // Fall back to regular nav items
+                const activeNav = document.querySelector(`.nav-item[data-section="${currentSection}"]`);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+            }
+        }
+
+        // Initialize navigation on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate overview subnav after content is loaded
+            setTimeout(() => {
+                populateOverviewSubnav();
+                updateActiveNavigationWithSubnav();
+            }, 100);
+            
+            // Add smooth scrolling for all anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

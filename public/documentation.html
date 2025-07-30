@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper API Documentation</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Complete documentation for Whisper API - WhatsApp integration made simple with RESTful endpoints and multi-instance support.">
+    <meta name="keywords" content="WhatsApp API documentation, messaging API, multi-instance WhatsApp, webhook integration">
+    <meta name="author" content="Whisper API">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #5a67d8, #6b46c1);
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 39;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100vh;
+            overflow-y: auto;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 40;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        
+        /* Main content styles */
+        .content {
+            margin-left: 320px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
+            background: #fafbfc;
+        }
+        
+        .content.full-width {
+            margin-left: 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+        
+        /* Header styles */
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem;
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .mobile-header {
+                display: flex;
+                justify-content: between;
+                align-items: center;
+            }
+        }
+        
+        /* Sidebar header */
+        .sidebar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+        
+        /* Navigation styles */
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .nav-section:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #f8fafc;
+            color: #3730a3;
+            border-left-color: #e0e7ff;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(90deg, #e0e7ff, #f1f5ff);
+            color: #3730a3;
+            font-weight: 600;
+            border-left-color: #667eea;
+        }
+        
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        
+        /* Content styling */
+        .content-wrapper {
+            max-width: 4xl;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .doc-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+        
+        .doc-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        /* Typography */
+        .doc-title {
+            color: #1e293b;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .doc-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            color: #1e293b;
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        /* Code blocks */
+        .code-container {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+        
+        .code-header {
+            background: #2d3748;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre;
+            border: 1px solid #2d3748;
+            border-top: none;
+        }
+        
+        /* Table styles */
+        .doc-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1.5rem 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .doc-table th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .doc-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .doc-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Mobile Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="/logo.svg" alt="Whisper API" class="w-8 h-8 mr-3">
+                <h1 class="text-xl font-bold text-gray-800">Whisper API Docs</h1>
+            </div>
+            <button id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-indigo-600 focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    <!-- </header> -->
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="flex items-center justify-between relative z-10">
+                <div class="flex items-center">
+                    <!-- <img src="/logo.svg" alt="Whisper API" class="w-10 h-10 mr-3"> -->
+                    <div>
+                        <h2 class="text-xl font-bold">Whisper API</h2>
+                        <p class="text-sm opacity-80">Documentation</p>
+                    </div>
+                </div>
+                <button id="sidebar-close" class="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg lg:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="nav-section">
+            <h3 class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Navigation</h3>
+            <a href="#overview" class="nav-item active" data-section="overview">
+                <i class="nav-icon fas fa-home"></i>
+                <span>Overview</span>
+            </a>
+            <a href="#installation" class="nav-item" data-section="installation">
+                <i class="nav-icon fas fa-download"></i>
+                <span>Installation</span>
+            </a>
+            <a href="#setup" class="nav-item" data-section="setup">
+                <i class="nav-icon fas fa-cog"></i>
+                <span>Setup Guide</span>
+            </a>
+            <a href="#endpoints" class="nav-item" data-section="endpoints">
+                <i class="nav-icon fas fa-code"></i>
+                <span>API Endpoints</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <h3 class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">API Collections</h3>
+            <a href="#api-overview" class="nav-item" data-section="api-overview">
+                <i class="nav-icon fas fa-layer-group"></i>
+                <span>Collections Overview</span>
+            </a>
+            <a href="#testing" class="nav-item" data-section="testing">
+                <i class="nav-icon fas fa-vial"></i>
+                <span>Testing</span>
+            </a>
+            <a href="#examples" class="nav-item" data-section="examples">
+                <i class="nav-icon fas fa-play"></i>
+                <span>Examples</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <h3 class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Resources</h3>
+            <a href="#troubleshooting" class="nav-item" data-section="troubleshooting">
+                <i class="nav-icon fas fa-wrench"></i>
+                <span>Troubleshooting</span>
+            </a>
+            <a href="#contributing" class="nav-item" data-section="contributing">
+                <i class="nav-icon fas fa-hands-helping"></i>
+                <span>Contributing</span>
+            </a>
+        </div>
+    </div>
+</header>
+    <!-- Main Content -->
+    <div id="content" class="content">
+        <div class="content-wrapper">
+            <!-- Overview Section -->
+            <section id="overview" class="doc-section loading">
+                <div class="text-center mb-8">
+                    <img src="/logo.svg" alt="Whisper API Logo" class="w-24 h-24 mx-auto mb-4">
+                    <h1 class="doc-title">Whisper API</h1>
+                    <p class="doc-subtitle">A RESTful WhatsApp messaging API built with Express.js and Baileys library for seamless WhatsApp integration.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-indigo-100">
+                        <i class="fas fa-rocket text-3xl text-indigo-600 mb-4"></i>
+                        <h3 class="font-semibold text-lg mb-2">Easy Integration</h3>
+                        <p class="text-gray-600 text-sm">Simple RESTful API endpoints for WhatsApp messaging</p>
+                    </div>
+                    <div class="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-emerald-100">
+                        <i class="fas fa-users text-3xl text-emerald-600 mb-4"></i>
+                        <h3 class="font-semibold text-lg mb-2">Multi-Instance</h3>
+                        <p class="text-gray-600 text-sm">Manage multiple WhatsApp instances simultaneously</p>
+                    </div>
+                    <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg border border-violet-100">
+                        <i class="fas fa-webhook text-3xl text-violet-600 mb-4"></i>
+                        <h3 class="font-semibold text-lg mb-2">Webhooks</h3>
+                        <p class="text-gray-600 text-sm">Real-time event notifications via HTTP webhooks</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg border border-indigo-200">
+                    <h3 class="section-title text-lg">Key Features</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>🏓 <strong>Ping/Pong</strong> - Health check endpoint</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>📊 <strong>Status Check</strong> - Connection monitoring</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>📨 <strong>Send Message</strong> - Text messages to personal chats</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>👥 <strong>Group Messages</strong> - Send to WhatsApp groups</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>🔗 <strong>Webhooks</strong> - Real-time notifications</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-3"></span>
+                            <span>📋 <strong>Logging</strong> - Comprehensive activity logs</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation Section -->
+            <section id="installation" class="doc-section loading">
+                <h2 class="section-title">Installation</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">1. Clone the repository</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span>Terminal</span>
+                                <button class="copy-btn" onclick="copyToClipboard(this)" data-code="git clone https://github.com/ibnusyawall/whisper-api.git&#10;cd whisper-api">
+                                    <i class="fas fa-copy mr-1"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="code-block">git clone https://github.com/ibnusyawall/whisper-api.git
+cd whisper-api</pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">2. Install dependencies</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span>Terminal</span>
+                                <button class="copy-btn" onclick="copyToClipboard(this)" data-code="npm install">
+                                    <i class="fas fa-copy mr-1"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="code-block">npm install</pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">3. Environment setup</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span>Terminal</span>
+                                <button class="copy-btn" onclick="copyToClipboard(this)" data-code="cp .env.example .env">
+                                    <i class="fas fa-copy mr-1"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="code-block">cp .env.example .env</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- More sections would continue here... -->
+            <!-- For brevity, I'll add a simplified version -->
+            
+            <section id="setup" class="doc-section loading">
+                <h2 class="section-title">Setup Guide</h2>
+                <p class="text-gray-600 mb-6">Complete setup instructions for both single and multi-instance modes.</p>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="font-semibold text-yellow-800">Important Note</h4>
+                            <p class="text-yellow-700 text-sm mt-1">Configure your <code class="bg-yellow-100 px-1 rounded">.env</code> file with the required variables before starting the server.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api-overview" class="doc-section loading">
+                <h2 class="section-title">API Collections Overview</h2>
+                <p class="text-gray-600 mb-6">Organized HTTP collections for testing the WhatsApp API across different operational modes.</p>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                        <span class="badge badge-info mb-3">Single Instance</span>
+                        <h3 class="font-semibold mb-2">Legacy Mode</h3>
+                        <p class="text-sm text-gray-600">Simple single WhatsApp instance operation</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                        <span class="badge badge-success mb-3">Multi Instance</span>
+                        <h3 class="font-semibold mb-2">Advanced Mode</h3>
+                        <p class="text-sm text-gray-600">Managing multiple WhatsApp instances</p>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                        <span class="badge badge-warning mb-3">Hybrid</span>
+                        <h3 class="font-semibold mb-2">Both Modes</h3>
+                        <p class="text-sm text-gray-600">Full flexibility with all endpoints</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const content = document.getElementById('content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn?.addEventListener('click', toggleSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // Navigation active state
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.doc-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = item.getAttribute('data-section');
+                const targetElement = document.getElementById(targetSection);
+                
+                if (targetElement) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Close sidebar on mobile after navigation
+                    if (window.innerWidth <= 1024) {
+                        closeSidebar();
+                    }
+                }
+            });
+        });
+
+        // Copy to clipboard functionality
+        function copyToClipboard(button) {
+            const code = button.getAttribute('data-code');
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                button.style.background = 'rgba(34, 197, 94, 0.2)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        // Back to top button
+        const backToTopBtn = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn?.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Loading animation
+        setTimeout(() => {
+            sections.forEach(section => {
+                section.classList.add('loading');
+            });
+        }, 100);
+
+        // Responsive sidebar handling
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+
+</html>

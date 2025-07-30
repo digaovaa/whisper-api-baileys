@@ -1,6 +1,6 @@
 {
   "name": "whisper-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "WhatsApp REST API using Baileys library",
   "homepage": "https://github.com/ibnusyawall/whisper-api",
   "repository": {
@@ -9,8 +9,11 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:db": "jest tests/database.test.js"
   },
   "keywords": [
     "whatsapp",
@@ -22,18 +25,49 @@
   "author": "ibnusyawall",
   "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "axios": "^1.10.0",
     "baileys": "^6.7.18",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
+    "highlight.js": "^11.11.1",
+    "js-yaml": "^4.1.0",
+    "marked": "^16.1.1",
     "morgan": "^1.10.0",
+    "postman-to-openapi": "^1.7.3",
+    "prisma": "^6.12.0",
     "qrcode-terminal": "^0.12.0",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "jest": "^30.0.4"
+  },
   "engines": {
     "node": ">=20.19.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/app.js",
+      "!**/node_modules/**"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ]
+  }
 }

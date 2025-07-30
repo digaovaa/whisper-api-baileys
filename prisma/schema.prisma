@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Instance {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  name      String
+  alias     String?
+  status    String   @default("inactive")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  webhooks        Webhook[]
+  messages        Message[]
+  instanceLogs    InstanceLog[]
+  webhookHistory  WebhookHistory[]
+
+  @@map("instances")
+}
+
+model InstanceLog {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  instanceId String    @map("instance_id") @db.ObjectId
+  level      String
+  message    String
+  timestamp  DateTime  @default(now())
+
+  // Relations
+  instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("instance_logs")
+}
+
+model Webhook {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  instanceId String   @map("instance_id") @db.ObjectId
+  type       String
+  event      String
+  url        String
+  isEnabled  Boolean  @default(true) @map("is_enabled")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  webhookHistory  WebhookHistory[]
+
+  @@map("webhooks")
+}
+
+model WebhookHistory {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  instanceId        String    @map("instance_id") @db.ObjectId
+  webhookId         String    @map("webhook_id") @db.ObjectId
+  event             String    // "message.received", "message.sent", "connection.update"
+  status            String    // "success", "failed", "timeout"
+  httpStatusCode    Int?      @map("http_status_code")
+  responseTime      Int?      @map("response_time") // milliseconds
+  payload           Json      // The data sent to webhook
+  response          Json?     // Response from webhook endpoint (if any)
+  errorMessage      String?   @map("error_message")
+  retryCount        Int       @default(0) @map("retry_count")
+  triggeredAt       DateTime  @default(now()) @map("triggered_at")
+  completedAt       DateTime? @map("completed_at")
+
+  // Relations
+  instance Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  webhook  Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_history")
+}
+
+model Message {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  instanceId String    @map("instance_id") @db.ObjectId
+  direction  String    // "incoming" or "outgoing"
+  to         String?
+  from       String?
+  type       String    // "text", "image", "audio", "video", "document", etc.
+  message    Json      // Store message content as JSON
+  status     String    @default("pending") // "pending", "sent", "delivered", "read", "failed"
+  sentAt     DateTime? @map("sent_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  instance   Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}

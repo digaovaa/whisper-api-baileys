@@ -1,0 +1,164 @@
+### Integration Tests for WhatsApp API
+### Complete workflow testing across all modes
+### Base URL: http://localhost:3000/api/v1
+
+#####################
+### SETUP & MODE CHECK
+#####################
+
+###
+# 1. Check Current Mode
+GET http://localhost:3000/api/v1/mode
+Content-Type: application/json
+
+#####################
+### SINGLE INSTANCE WORKFLOW
+### (Available when mode=single or mode=both)
+#####################
+
+###
+# 2. Health Check - Legacy
+GET http://localhost:3000/api/v1/ping
+Content-Type: application/json
+
+###
+# 3. Status Check - Legacy
+GET http://localhost:3000/api/v1/status
+Content-Type: application/json
+
+###
+# 4. Send Test Message - Legacy
+POST http://localhost:3000/api/v1/message
+Content-Type: application/json
+
+{
+  "phoneNumber": "{{test_phone}}",
+  "message": "Integration test message from legacy API"
+}
+
+###
+# 5. Check System Logs - Legacy
+GET http://localhost:3000/api/v1/logs?limit=10
+Content-Type: application/json
+
+#####################
+### MULTI-INSTANCE WORKFLOW
+### (Available when mode=multi or mode=both)
+#####################
+
+###
+# 6. Get All Instances
+GET http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+###
+# 7. Create Test Instance
+POST http://localhost:3000/api/v1/instances
+Content-Type: application/json
+
+{
+  "phone": "{{phone_number}}",
+  "name": "Integration Test Instance",
+  "alias": "integration-test"
+}
+
+###
+# 8. Get QR Code for Authentication
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/qr
+Content-Type: application/json
+
+###
+# 9. Check Instance Status
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/status
+Content-Type: application/json
+
+###
+# 10. Send Message from Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-message
+Content-Type: application/json
+
+{
+  "to": "{{test_phone}}",
+  "message": "Integration test message from multi-instance API"
+}
+
+###
+# 11. Send Media from Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/send-media
+Content-Type: application/json
+
+{
+  "to": "{{test_phone}}",
+  "media": {
+    "type": "image",
+    "url": "https://picsum.photos/300/200",
+    "caption": "Integration test image"
+  }
+}
+
+###
+# 12. Check Instance Logs
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/logs?limit=10
+Content-Type: application/json
+
+###
+# 13. Update Instance Info
+PUT http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+{
+  "name": "Updated Integration Test Instance",
+  "alias": "updated-integration-test"
+}
+
+###
+# 14. Verify Update
+GET http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+#####################
+### CLEANUP
+#####################
+
+###
+# 15. Delete Test Instance (Cleanup)
+DELETE http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+###
+# 16. Verify Deletion
+GET http://localhost:3000/api/v1/instances/{{phone_number}}
+Content-Type: application/json
+
+#####################
+### ERROR HANDLING TESTS
+#####################
+
+###
+# 17. Test Non-existent Instance
+GET http://localhost:3000/api/v1/instances/628999999999
+Content-Type: application/json
+
+###
+# 18. Test Invalid Message (Legacy)
+POST http://localhost:3000/api/v1/message
+Content-Type: application/json
+
+{
+  "message": "Missing phone number"
+}
+
+###
+# 19. Test Invalid Message (Multi-instance)
+POST http://localhost:3000/api/v1/instances/628999999999/send-message
+Content-Type: application/json
+
+{
+  "to": "{{test_phone}}",
+  "message": "This should fail - instance doesn't exist"
+}
+
+###
+# 20. Final Status Check
+GET http://localhost:3000/api/v1/mode
+Content-Type: application/json

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: whisper-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+
+  mongo-setup:
+    image: mongo:latest
+    depends_on:
+      - mongo
+    restart: "no"
+    volumes:
+      - ./mongo-setup.js:/mongo-setup.js
+    entrypoint: [ "/bin/bash", "-c", "mongosh mongodb://mongo:27017 /mongo-setup.js" ]
+
+volumes:
+  mongo-data:
+    driver: local
+

@@ -1,0 +1,28 @@
+### Global WhatsApp API Endpoints
+### These endpoints are available in all operational modes
+### Base URL: http://localhost:3000/api/v1
+
+###
+# Get Current Mode Information
+# Returns information about the current operational mode and enabled features
+GET http://localhost:3000/api/v1/mode
+Content-Type: application/json
+
+###
+# Example Response:
+# {
+#   "success": true,
+#   "data": {
+#     "mode": "both",
+#     "description": "Hybrid Mode (Single + Multi Instance)",
+#     "features": {
+#       "singleInstance": true,
+#       "multiInstance": true
+#     },
+#     "availableModes": {
+#       "SINGLE": "single",
+#       "MULTI": "multi",
+#       "BOTH": "both"
+#     }
+#   }
+# }

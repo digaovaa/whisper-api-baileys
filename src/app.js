@@ -1,10 +1,14 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
 const whatsappService = require('./services/whatsapp.service');
+const instanceManager = require('./services/whatsappInstanceManager.service');
+const modeConfig = require('./config/mode.config');
 const routes = require('./routes');
+
 require('dotenv').config();
 
 const app = express();
@@ -22,8 +26,20 @@ process.on('SIGUSR1', async () => {
     await whatsappService.reloadPlugins();
 });
 
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Middleware
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+                "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+                "img-src": ["'self'", "data:", "https:", "http:"],
+            },
+        },
+    })
+);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,7 +54,12 @@ app.use(morgan('combined', {
 }));
 
 // Routes
-app.use('/api/v1', routes);
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Mount all routes (docs and API)
+app.use(routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -59,13 +80,42 @@ app.use((req, res) => {
     });
 });
 
-// Initialize WhatsApp service
-whatsappService.initialize();
+// Initialize services based on configured mode
+const initializeServices = async () => {
+    try {
+        logger.info(`🔧 Starting in ${modeConfig.getModeDescription()}`);
+
+        // Initialize single-instance service (legacy) if enabled
+        if (modeConfig.isSingleModeEnabled()) {
+            logger.info('🔄 Initializing single-instance service (legacy)...');
+            await whatsappService.initialize();
+            logger.info('✅ Single-instance service initialized');
+        } else {
+            logger.info('⏭️  Single-instance service disabled');
+        }
+
+        // Initialize multi-instance manager if enabled
+        if (modeConfig.isMultiModeEnabled()) {
+            logger.info('🔄 Initializing multi-instance manager...');
+            await instanceManager.initialize();
+            logger.info('✅ Multi-instance manager initialized');
+        } else {
+            logger.info('⏭️  Multi-instance manager disabled');
+        }
+
+        logger.info('✅ WhatsApp services initialization completed');
+    } catch (error) {
+        logger.error('❌ Error initializing WhatsApp services:', error);
+    }
+};
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     logger.info(`🚀 Server running on port ${PORT}`);
     logger.info(`📱 WhatsApp API server started`);
+
+    // Initialize services after server starts
+    await initializeServices();
 });
 
 module.exports = app;

@@ -1,0 +1,1020 @@
+{
+	"info": {
+		"_postman_id": "whatsapp-multi-instance-api",
+		"name": "Whisper - WhatsApp API",
+		"description": "Complete API collection for WhatsApp management and messaging with configurable operational modes. Available modes: single (legacy only), multi (multi-instance only), both (hybrid mode).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"version": {
+			"major": 1,
+			"minor": 1,
+			"patch": 0
+		}
+	},
+	"item": [
+		{
+			"name": "🌐 Global Endpoints",
+			"description": "Global endpoints available in all operational modes",
+			"item": [
+				{
+					"name": "Get Mode Information",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mode",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mode"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔀 Single Instance (Legacy)",
+			"description": "Legacy endpoints for single WhatsApp instance operation. Available when WHATSAPP_MODE=single or WHATSAPP_MODE=both",
+			"item": [
+				{
+					"name": "System Monitoring",
+					"item": [
+						{
+							"name": "Ping - Health Check",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/ping",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "ping"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Status Check",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/status",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "status"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get System Logs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/logs?limit=50",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "logs"],
+									"query": [
+										{
+											"key": "limit",
+											"value": "50"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Messaging",
+					"item": [
+						{
+							"name": "Send Personal Message",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"phoneNumber\": \"6282299265151\",\n  \"message\": \"Hello! This is a test message from WhatsApp API.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/message",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "message"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Group Message",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"groupId\": \"120363042123456789@g.us\",\n  \"message\": \"Hello group! This is a test message from WhatsApp API.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/message/group",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "message", "group"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🏢 Multi-Instance Management",
+			"description": "Modern multi-instance WhatsApp API endpoints with /instances prefix. Available when WHATSAPP_MODE=multi or WHATSAPP_MODE=both",
+			"item": [
+				{
+					"name": "Instance Management",
+					"item": [
+						{
+							"name": "Get All Instances",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance by Phone",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create New Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"phone\": \"628123456789\",\n  \"name\": \"Test Instance\",\n  \"alias\": \"test-alias\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Instance",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Updated Instance Name\",\n  \"alias\": \"updated-alias\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Instance",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Restart Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/restart",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "restart"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get QR Code",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/qr",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "qr"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Instance Monitoring",
+					"item": [
+						{
+							"name": "Ping Instance",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/ping",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "ping"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/status",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "status"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Logs - All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/logs",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "logs"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Logs - With Pagination",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/logs?limit=50&skip=0",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "logs"],
+									"query": [
+										{
+											"key": "limit",
+											"value": "50"
+										},
+										{
+											"key": "skip",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Logs - Filter by Level",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/logs?level=error&limit=100",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "logs"],
+									"query": [
+										{
+											"key": "level",
+											"value": "error"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Logs - With Date Range",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/logs?startDate=2024-01-01T00:00:00.000Z&endDate=2024-12-31T23:59:59.999Z",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "logs"],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2024-01-01T00:00:00.000Z"
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-31T23:59:59.999Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Logs - Combined Filters",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/logs?level=info&limit=25&skip=0&startDate=2024-07-01T00:00:00.000Z",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "logs"],
+									"query": [
+										{
+											"key": "level",
+											"value": "info"
+										},
+										{
+											"key": "limit",
+											"value": "25"
+										},
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "startDate",
+											"value": "2024-07-01T00:00:00.000Z"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Text Messaging",
+					"item": [
+						{
+							"name": "Send Message from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"to\": \"628987654321\",\n  \"message\": \"Hello from multi-instance WhatsApp API!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-message",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-message"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Group Message from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"groupId\": \"120363042123456789@g.us\",\n  \"message\": \"Hello group from multi-instance WhatsApp API!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-group-message",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-group-message"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Media Messaging",
+					"item": [
+						{
+							"name": "Send Image Media from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"to\": \"628987654321\",\n  \"media\": {\n    \"type\": \"image\",\n    \"url\": \"https://picsum.photos/400/300\",\n    \"caption\": \"Test image from multi-instance API\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-media",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-media"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Video Media from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"to\": \"628987654321\",\n  \"media\": {\n    \"type\": \"video\",\n    \"url\": \"https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4\",\n    \"caption\": \"Test video from multi-instance API\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-media",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-media"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Document Media from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"to\": \"628987654321\",\n  \"media\": {\n    \"type\": \"document\",\n    \"url\": \"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf\",\n    \"filename\": \"test-document.pdf\",\n    \"caption\": \"Test document from multi-instance API\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-media",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-media"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send Audio Media from Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"to\": \"628987654321\",\n  \"media\": {\n    \"type\": \"audio\",\n    \"url\": \"https://www.soundjay.com/misc/sounds/bell-ringing-05.wav\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/send-media",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "send-media"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Webhook Management",
+					"item": [
+						{
+							"name": "Get All Webhooks for Instance",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Webhook for Instance",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+								"raw": "{\n  \"type\": \"http\",\n  \"event\": \"message.received\",\n  \"url\": \"https://your-webhook-endpoint.com/webhook\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Specific Webhook by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "{{webhook_id}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Webhook",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"url\": \"https://new-webhook-endpoint.com/webhook\",\n  \"isEnabled\": false\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "{{webhook_id}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Webhook Status",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"isEnabled\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}/toggle",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "{{webhook_id}}", "toggle"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Webhook",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "{{webhook_id}}"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Webhook History",
+					"item": [
+						{
+							"name": "Get Instance Webhook History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/history?limit=50&page=1",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "history"],
+									"query": [
+										{
+											"key": "limit",
+											"value": "50"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Webhook History Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/history/stats",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "history", "stats"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Instance Webhook History Failures",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/history/failures",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "history", "failures"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Specific Webhook History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/webhooks/{{webhook_id}}/history",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "webhooks", "{{webhook_id}}", "history"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Global Webhook History (Admin)",
+					"item": [
+						{
+							"name": "Get Global Webhook History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history?limit=100&page=1",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history"],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Global Webhook History Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/stats",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "stats"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Global Webhook History Failures",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/failures",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "failures"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Webhook History by Event Type",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/events/message.received",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "events", "message.received"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Webhook History by Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/statuses/success",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "statuses", "success"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Webhook History by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/{{history_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "{{history_id}}"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cleanup Old Webhook History",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"daysOld\": 30\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/webhooks/history/cleanup",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "webhooks", "history", "cleanup"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [""]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [""]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "phone_number",
+			"value": "628123456789",
+			"type": "string"
+		},
+		{
+			"key": "webhook_id",
+			"value": "your_webhook_id_here",
+			"type": "string"
+		},
+		{
+			"key": "history_id",
+			"value": "your_history_id_here",
+			"type": "string"
+		}
+	]
+}

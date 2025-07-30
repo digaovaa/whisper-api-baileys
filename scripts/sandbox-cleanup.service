@@ -9,7 +9,8 @@ Group=www-data
 WorkingDirectory=/path/to/whisper-api
 Environment=NODE_ENV=production
 Environment=DATABASE_URL=your_database_url_here
-ExecStart=/usr/bin/node /path/to/whisper-api/scripts/sandbox-cleanup.js
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/local/bin/node /path/to/whisper-api/scripts/sandbox-cleanup.js
 StandardOutput=journal
 StandardError=journal
 

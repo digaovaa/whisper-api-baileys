@@ -3,13 +3,20 @@
 /**
  * Sandbox Cleanup Script
  * 
- * This script cleans up all test data from the sandbox environment that is older than 30 minutes.
+ * This script cleans up test data from the sandbox environment that is older than 30 minutes.
  * It removes:
- * - All Prisma model records older than 30 minutes
+ * - All Prisma model records older than 30 minutes (including instances for privacy)
  * - WhatsApp session files
  * - QR code images
  * - Temporary files
  * - Upload directories
+ * 
+ * PRIVACY NOTE: For sandbox/demo environments, instances are automatically logged out
+ * after 30 minutes to protect user privacy. This is appropriate for demonstration
+ * purposes only.
+ * 
+ * PRODUCTION NOTE: Disable this script in production environments by setting
+ * SANDBOX_MODE=false or NODE_ENV=production
  * 
  * Usage:
  * - Manual: node scripts/sandbox-cleanup.js
@@ -43,9 +50,17 @@ const logger = createLogger({
   ]
 });
 
-// Cleanup configuration
+// Environment and cleanup configuration
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const SANDBOX_MODE = process.env.SANDBOX_MODE !== 'false';
 const CLEANUP_THRESHOLD_MINUTES = 30;
 const CLEANUP_THRESHOLD_MS = CLEANUP_THRESHOLD_MINUTES * 60 * 1000;
+
+// Safety check - don't run in production unless explicitly enabled
+if (NODE_ENV === 'production' && SANDBOX_MODE) {
+  logger.warn('⚠️  Running cleanup in production mode with SANDBOX_MODE=true');
+  logger.warn('⚠️  This will delete user data! Set SANDBOX_MODE=false to disable.');
+}
 
 /**
  * Calculate the cutoff time for cleanup (30 minutes ago)
@@ -56,10 +71,18 @@ function getCleanupCutoffTime() {
 
 /**
  * Clean up database records older than 30 minutes
+ * NOTE: Includes instance deletion for privacy compliance in sandbox mode
  */
 async function cleanupDatabaseRecords() {
+  // Check if cleanup should be skipped for production
+  if (NODE_ENV === 'production' && !SANDBOX_MODE) {
+    logger.info('🛡️  Cleanup skipped - running in production mode with SANDBOX_MODE=false');
+    return 0;
+  }
+
   const cutoffTime = getCleanupCutoffTime();
   logger.info(`🗑️  Starting database cleanup for records older than ${cutoffTime.toISOString()}`);
+  logger.info(`🔒 Privacy mode: Instances will be logged out after 30 minutes for security`);
 
   try {
     // Clean up in order of dependencies (child records first)
@@ -104,7 +127,7 @@ async function cleanupDatabaseRecords() {
     });
     logger.info(`✅ Deleted ${deletedWebhooks.count} webhook records`);
 
-    // 5. Clean up Instances (this will cascade delete remaining related records)
+    // 5. Clean up Instances for privacy compliance (this will cascade delete remaining related records)
     const deletedInstances = await prisma.instance.deleteMany({
       where: {
         createdAt: {
@@ -112,8 +135,8 @@ async function cleanupDatabaseRecords() {
         }
       }
     });
-    logger.info(`✅ Deleted ${deletedInstances.count} instance records`);
-
+    logger.info(`✅ Deleted ${deletedInstances.count} instance records (privacy compliance)`);
+    
     const totalDeleted = deletedWebhookHistory.count + deletedInstanceLogs.count + 
                         deletedMessages.count + deletedWebhooks.count + deletedInstances.count;
     
@@ -130,6 +153,12 @@ async function cleanupDatabaseRecords() {
  * Clean up file system artifacts
  */
 async function cleanupFileSystem() {
+  // Check if cleanup should be skipped for production
+  if (NODE_ENV === 'production' && !SANDBOX_MODE) {
+    logger.info('🛡️  File cleanup skipped - running in production mode with SANDBOX_MODE=false');
+    return 0;
+  }
+
   logger.info('🗂️  Starting file system cleanup');
   
   const cleanupDirs = [

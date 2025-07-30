@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="#4F46E5" stroke="#3730A3" stroke-width="2"/>
+  
+  <!-- Chat bubble -->
+  <path d="M25 35 L70 35 Q75 35 75 40 L75 55 Q75 60 70 60 L40 60 L30 70 L30 60 L30 60 Q25 60 25 55 L25 40 Q25 35 30 35 Z" fill="white" opacity="0.9"/>
+  
+  <!-- Message lines -->
+  <rect x="32" y="42" width="30" height="2" rx="1" fill="#4F46E5"/>
+  <rect x="32" y="48" width="24" height="2" rx="1" fill="#4F46E5"/>
+  <rect x="32" y="54" width="20" height="2" rx="1" fill="#4F46E5"/>
+  
+  <!-- Sound waves (whisper effect) -->
+  <path d="M78 45 Q82 47 78 49" stroke="white" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <path d="M82 42 Q88 47 82 52" stroke="white" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M86 38 Q94 47 86 56" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+</svg>

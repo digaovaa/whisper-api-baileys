@@ -27,6 +27,7 @@ const { PrismaClient } = require('../src/generated/prisma');
 const fs = require('fs').promises;
 const path = require('path');
 const { createLogger, format, transports } = require('winston');
+const instanceManager = require('../src/services/whatsappInstanceManager.service');
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
@@ -67,6 +68,62 @@ if (NODE_ENV === 'production' && SANDBOX_MODE) {
  */
 function getCleanupCutoffTime() {
   return new Date(Date.now() - CLEANUP_THRESHOLD_MS);
+}
+
+/**
+ * Logout and properly disconnect WhatsApp instances older than 30 minutes
+ */
+async function logoutExpiredInstances() {
+  // Check if cleanup should be skipped for production
+  if (NODE_ENV === 'production' && !SANDBOX_MODE) {
+    logger.info('🛡️  Instance logout skipped - running in production mode with SANDBOX_MODE=false');
+    return 0;
+  }
+
+  const cutoffTime = getCleanupCutoffTime();
+  logger.info(`🔐 Starting WhatsApp instance logout for instances older than ${cutoffTime.toISOString()}`);
+
+  try {
+    // Find instances that need to be logged out
+    const expiredInstances = await prisma.instance.findMany({
+      where: {
+        createdAt: {
+          lt: cutoffTime
+        }
+      }
+    });
+
+    if (expiredInstances.length === 0) {
+      logger.info('📱 No expired instances found to logout');
+      return 0;
+    }
+
+    logger.info(`📱 Found ${expiredInstances.length} expired instances to logout`);
+    let loggedOutCount = 0;
+
+    // Logout each instance properly
+    for (const instance of expiredInstances) {
+      try {
+        logger.info(`🔐 Logging out WhatsApp instance: ${instance.phone} (${instance.name})`);
+        
+        // Use the instance manager to properly logout and cleanup
+        await instanceManager.deleteInstance(instance.phone);
+        loggedOutCount++;
+        
+        logger.info(`✅ Successfully logged out and cleaned up instance: ${instance.phone}`);
+      } catch (error) {
+        logger.warn(`⚠️  Failed to logout instance ${instance.phone}: ${error.message}`);
+        // Continue with other instances even if one fails
+      }
+    }
+
+    logger.info(`🎯 WhatsApp logout completed: ${loggedOutCount}/${expiredInstances.length} instances logged out`);
+    return loggedOutCount;
+
+  } catch (error) {
+    logger.error(`❌ WhatsApp instance logout failed: ${error.message}`);
+    throw error;
+  }
 }
 
 /**
@@ -127,18 +184,12 @@ async function cleanupDatabaseRecords() {
     });
     logger.info(`✅ Deleted ${deletedWebhooks.count} webhook records`);
 
-    // 5. Clean up Instances for privacy compliance (this will cascade delete remaining related records)
-    const deletedInstances = await prisma.instance.deleteMany({
-      where: {
-        createdAt: {
-          lt: cutoffTime
-        }
-      }
-    });
-    logger.info(`✅ Deleted ${deletedInstances.count} instance records (privacy compliance)`);
+    // 5. NOTE: Instance cleanup is handled by logoutExpiredInstances() function
+    // which properly logs out WhatsApp instances before database deletion
+    logger.info(`📱 Instance cleanup handled by WhatsApp logout process`);
     
     const totalDeleted = deletedWebhookHistory.count + deletedInstanceLogs.count + 
-                        deletedMessages.count + deletedWebhooks.count + deletedInstances.count;
+                        deletedMessages.count + deletedWebhooks.count;
     
     logger.info(`🎯 Database cleanup completed: ${totalDeleted} total records removed`);
     return totalDeleted;
@@ -272,19 +323,23 @@ async function runCleanup() {
     } catch (error) {
       // Directory might already exist, ignore error
     }
+    
+    // 1. Logout expired WhatsApp instances (which also handles db deletion)
+    const instancesLoggedOut = await logoutExpiredInstances();
 
-    // Run database cleanup
+    // 2. Clean up remaining database records
     const dbRecordsDeleted = await cleanupDatabaseRecords();
     
-    // Run file system cleanup
+    // 3. Clean up any orphaned file system artifacts
     const filesDeleted = await cleanupFileSystem();
     
     const duration = Date.now() - startTime;
     logger.info(`🎉 Sandbox cleanup completed successfully!`);
-    logger.info(`📊 Summary: ${dbRecordsDeleted} DB records + ${filesDeleted} files deleted in ${duration}ms`);
+    logger.info(`📊 Summary: ${instancesLoggedOut} instances logged out, ${dbRecordsDeleted} DB records + ${filesDeleted} files deleted in ${duration}ms`);
     
     return {
       success: true,
+      instancesLoggedOut,
       dbRecordsDeleted,
       filesDeleted,
       duration
@@ -318,4 +373,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { runCleanup, cleanupDatabaseRecords, cleanupFileSystem };
+module.exports = { runCleanup, cleanupDatabaseRecords, cleanupFileSystem, logoutExpiredInstances };

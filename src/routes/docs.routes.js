@@ -42,35 +42,35 @@ function generateTryApiHtml() {
     // Remove warning banner HTML
     html = html.replace(/\s*<!-- Persistent warning banner -->[\s\S]*?<\/div>\s*<\/div>\s*/, '\n  ');
     
-    // Remove countdown timer JavaScript
-    html = html.replace(/\s*\/\/ Countdown timer for sandbox warning[\s\S]*?updateTimer\(\);/s, '');
+    // Only remove the update timer call but preserve onload
+    html = html.replace(/\n\s+updateTimer\(\);/, '');
     
     // Fix the window.onload function to only initialize Swagger UI
-    html = html.replace(/window\.onload = function\(\) \{[\s\S]*?\};/, 
+    html = html.replace(/window\.onload = function\(\) \{[\s\S]*?\};/s, 
       `window.onload = function() {
-      // Initialize Swagger UI
-      const ui = SwaggerUIBundle({
-        url: './try-api/swagger.json',
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout",
-        docExpansion: 'list',
-        filter: true,
-        showRequestHeaders: true,
-        tryItOutEnabled: true,
-        requestInterceptor: (req) => {
-          req.headers['Content-Type'] = 'application/json';
-          return req;
-        }
-      });
-    };`);
+        // Initialize Swagger UI
+        const ui = SwaggerUIBundle({
+          url: './try-api/swagger.json',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          plugins: [
+            SwaggerUIBundle.plugins.DownloadUrl
+          ],
+          layout: "StandaloneLayout",
+          docExpansion: 'list',
+          filter: true,
+          showRequestHeaders: true,
+          tryItOutEnabled: true,
+          requestInterceptor: (req) => {
+            req.headers['Content-Type'] = 'application/json';
+            return req;
+          }
+        });
+      };`);
     
     return html;
   }

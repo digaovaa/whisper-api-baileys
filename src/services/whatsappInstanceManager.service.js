@@ -56,7 +56,37 @@ class WhatsAppInstance {
                 version,
                 auth: state,
                 printQRInTerminal: false,
-                logger: logger,
+                logger: {
+                    level: 'error',
+                    trace: () => {},
+                    debug: () => {},
+                    info: () => {},
+                    warn: () => {},
+                    error: (data, msg) => {
+                        // Only log meaningful errors, ignore debug objects
+                        if (msg && typeof msg === 'string') {
+                            logger.error(`[Baileys] ${msg}`);
+                        } else if (data && data.err && data.err instanceof Error) {
+                            logger.error(`[Baileys] ${data.err.message}`);
+                        }
+                    },
+                    fatal: (msg) => logger.error(`[Baileys Fatal] ${msg}`),
+                    child: () => ({
+                        level: 'error',
+                        trace: () => {},
+                        debug: () => {},
+                        info: () => {},
+                        warn: () => {},
+                        error: (data, msg) => {
+                            if (msg && typeof msg === 'string') {
+                                logger.error(`[Baileys] ${msg}`);
+                            } else if (data && data.err && data.err instanceof Error) {
+                                logger.error(`[Baileys] ${data.err.message}`);
+                            }
+                        },
+                        fatal: (msg) => logger.error(`[Baileys Fatal] ${msg}`)
+                    })
+                },
                 cachedGroupMetadata: async (jid) => {
                     if (this.groupMetadataCache.has(jid)) {
                         return this.groupMetadataCache.get(jid);
@@ -443,10 +473,21 @@ class WhatsAppInstance {
 
             logger.info(`📤 Sending group message from ${this.instanceData.phone} to ${jid}: ${messageText}`);
 
-            // Add watermark
+            // Ensure we have group metadata and participants before sending
+            try {
+                await this.sock.groupMetadata(jid);
+            } catch (metaError) {
+                logger.warn(`Could not fetch group metadata for ${jid}: ${metaError.message}`);
+            }
+
+            // Add watermark  
             const finalMessage = `${messageText}\n\n> Sent via ${(s => s[0].toUpperCase() + s.slice(1, s.indexOf('-')))(packageJson.name)}\n> @${packageJson.author}/${packageJson.name}.git`;
 
-            const result = await this.sock.sendMessage(jid, { text: finalMessage });
+            // Send with additional options to handle encryption properly
+            const result = await this.sock.sendMessage(jid, { text: finalMessage }, { 
+                ephemeralExpiration: 0,
+                messageId: undefined // Let Baileys generate the message ID
+            });
 
             // Store sent message in database
             const messageData = {

@@ -587,7 +587,7 @@ npm start # Production</pre>
                     const button = e.trigger;
                     const originalText = button.textContent;
 
-                    console.log('Copy successful:', e.text);
+                    console.info('Copy successful:', e.text);
 
                     // Change button text to 'Copied'
                     button.textContent = 'Copied';
@@ -620,13 +620,6 @@ npm start # Production</pre>
                         button.classList.remove('bg-red-500', 'hover:bg-red-600');
                         button.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
                     }, 2000);
-                });
-
-                // Debug: Log all copy buttons found
-                const copyButtons = document.querySelectorAll('.copy-btn');
-                console.log('Found copy buttons:', copyButtons.length);
-                copyButtons.forEach((btn, index) => {
-                    console.log(`Button ${index + 1}:`, btn.getAttribute('data-clipboard-text'));
                 });
             } else {
                 console.error('ClipboardJS not loaded!');

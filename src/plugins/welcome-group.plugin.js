@@ -87,9 +87,9 @@ async function scheduleWelcome(groupId, participants, sock) {
                 const isAdmin = groupMetadata.participants
                     .find(p => p.id === botJid)?.admin;
 
-                // Skip if bot is not admin OR if it's an announce-only group where bot can't send messages
-                if (!isAdmin || (groupMetadata.announce && !isAdmin)) { 
-                    let reason = !isAdmin ? 'Bot is not admin' : 'Group is announce-only and bot is not admin';
+                // Skip if bot is not admin OR if it's an announce-only group
+                if (!isAdmin || groupMetadata.announce) { 
+                    let reason = !isAdmin ? 'Bot is not admin' : 'Group is announce-only';
                     logger.info(`🚫 Skipping welcome message for ${subjectGroup} (${groupId}) - ${reason}`);
                     clearGroupData(groupId);
                     return;
@@ -111,7 +111,7 @@ async function scheduleWelcome(groupId, participants, sock) {
                 // Clear participants list and scheduling flag on error
                 clearGroupData(groupId);
             }
-        }, 10 * 1000); // 10 seconds for testing
+        }, 5 * 60 * 1000); // 5 minute 
     }
 }
 

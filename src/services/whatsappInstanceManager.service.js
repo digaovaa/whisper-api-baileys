@@ -149,11 +149,22 @@ class WhatsAppInstance {
             if (connection === 'close') {
                 const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
                 const disconnectReason = lastDisconnect?.error?.output?.statusCode;
+                const errorMessage = lastDisconnect?.error?.message;
+                
+                logger.info(`🔌 Connection closed for ${this.instanceData.phone}. Reason: ${disconnectReason}, Error: ${errorMessage}`);
 
-                // Don't auto-reconnect if this is a manual restart
-                if (shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts && !this.isManualRestart) {
+                // Check if this is a real manual restart or just a stream error
+                // Stream errors (code 515) during QR scanning should not be treated as manual restart
+                const isStreamError = disconnectReason === 515;
+                const wasManualRestart = this.isManualRestart && !isStreamError;
+                
+                // Reset manual restart flag after connection close
+                this.isManualRestart = false;
+
+                // Don't auto-reconnect if this was a manual restart or if we're logged out
+                if (shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts && !wasManualRestart) {
                     this.reconnectAttempts++;
-                    logger.info(`🔄 Connection closed for ${this.instanceData.phone}, reconnecting... (attempt ${this.reconnectAttempts})`);
+                    logger.info(`🔄 Connection lost for ${this.instanceData.phone}, reconnecting... (attempt ${this.reconnectAttempts})`);
                     this.connectionStatus = 'reconnecting';
                     this.isConnected = false;
                     await instanceService.updateStatus(this.instanceData.id, 'reconnecting');
@@ -166,29 +177,46 @@ class WhatsAppInstance {
                         reconnectAttempt: this.reconnectAttempts,
                         maxReconnectAttempts: this.maxReconnectAttempts,
                         message: `Connection lost. Reconnecting... (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
-                        disconnectReason: disconnectReason
+                        disconnectReason: disconnectReason,
+                        errorMessage: errorMessage
                     });
                     
                     setTimeout(() => this.initialize(), 5000);
                 } else {
-                    if (this.isManualRestart) {
-                        logger.info(`🔄 Connection closed for ${this.instanceData.phone} due to manual restart`);
-                        this.isManualRestart = false; // Reset the flag
+                    if (wasManualRestart) {
+                        logger.info(`🔄 Connection closed for ${this.instanceData.phone} due to manual restart - not cleaning up`);
+                        // Don't clean up if it was a manual restart, just update status
+                        this.connectionStatus = 'disconnected';
+                        this.isConnected = false;
+                        await instanceService.updateStatus(this.instanceData.id, 'inactive');
                     } else {
                         logger.info(`🔓 Connection closed for ${this.instanceData.phone}, logged out or max reconnect attempts reached`);
+                        
+                        // Use the instance manager to handle logout and cleanup while keeping database records
+                        const instanceManager = require('./whatsappInstanceManager.service');
+                        try {
+                            await instanceManager.deleteInstance(this.instanceData.phone, true); // keepDatabaseRecord = true
+                            logger.info(`🗑️ Instance ${this.instanceData.phone} cleaned up, database record preserved`);
+                        } catch (cleanupError) {
+                            logger.error(`Error during logout cleanup for ${this.instanceData.phone}: ${cleanupError.message}`);
+                            // Fallback to manual cleanup
+                            await instanceService.updateStatus(this.instanceData.id, 'inactive');
+                        }
+                        
+                        this.connectionStatus = 'logged_out';
+                        this.isConnected = false;
                     }
-                    this.connectionStatus = 'logged_out';
-                    this.isConnected = false;
-                    await instanceService.updateStatus(this.instanceData.id, 'inactive');
                     
-                    // Trigger webhook for logged out state
+                    // Trigger webhook for connection close
                     await this.triggerWebhooks('connection.update', {
-                        status: 'logged_out',
+                        status: wasManualRestart ? 'manual_restart' : 'logged_out',
                         instance: this.instanceData,
                         timestamp: new Date().toISOString(),
-                        message: this.isManualRestart ? 'Connection closed due to manual restart' : 'Logged out or max reconnect attempts reached',
+                        message: wasManualRestart ? 'Connection closed due to manual restart' : 'Logged out or max reconnect attempts reached - auth folder cleaned, restart instance for new QR',
                         disconnectReason: disconnectReason,
-                        wasManualRestart: this.isManualRestart
+                        errorMessage: errorMessage,
+                        wasManualRestart: wasManualRestart,
+                        authFolderCleaned: !wasManualRestart
                     });
                 }
             } else if (connection === 'open') {
@@ -740,7 +768,7 @@ class WhatsAppInstanceManager {
         }
     }
 
-    async deleteInstance(phone) {
+    async deleteInstance(phone, keepDatabaseRecord = false) {
         try {
             const instance = this.instances.get(phone);
             if (instance) {
@@ -748,10 +776,12 @@ class WhatsAppInstanceManager {
                 this.instances.delete(phone);
             }
 
-            // Delete from database (cascade will handle webhooks and messages)
-            const dbInstance = await instanceService.findByPhone(phone);
-            if (dbInstance) {
-                await instanceService.delete(dbInstance.id);
+            // Delete from database only if not keeping records
+            if (!keepDatabaseRecord) {
+                const dbInstance = await instanceService.findByPhone(phone);
+                if (dbInstance) {
+                    await instanceService.delete(dbInstance.id);
+                }
             }
 
             // Remove auth directory
@@ -760,11 +790,15 @@ class WhatsAppInstanceManager {
                 fs.rmSync(authDir, { recursive: true, force: true });
             }
 
-            logger.info(`✅ WhatsApp instance deleted for ${phone}`);
-            return { success: true, message: 'Instance deleted successfully' };
+            const message = keepDatabaseRecord 
+                ? 'Instance logged out and cleaned up successfully. Restart to get new QR code.'
+                : 'Instance deleted successfully';
+            
+            logger.info(`✅ WhatsApp instance ${keepDatabaseRecord ? 'cleaned up' : 'deleted'} for ${phone}`);
+            return { success: true, message };
             
         } catch (error) {
-            logger.error(`❌ Error deleting WhatsApp instance ${phone}:`, error);
+            logger.error(`❌ Error ${keepDatabaseRecord ? 'cleaning up' : 'deleting'} WhatsApp instance ${phone}:`, error);
             throw error;
         }
     }

@@ -444,7 +444,13 @@ paths:
     post:
       tags:
         - 🏢 Multi-Instance Management > Media Messaging
-      summary: Send Audio Media from Instance
+      summary: Send Media from Instance (Images, Videos, Documents, Audio)
+      description: >-
+        Send various types of media files through a single unified endpoint. 
+        Supports: 📸 Images (JPG, PNG, GIF, WebP), 🎬 Videos (MP4, AVI, MOV), 
+        📄 Documents (PDF, DOC, XLS, PPT, ZIP), 🎵 Audio (MP3, WAV, AAC, OGG). 
+        Change the 'type' field to switch between media types. The example shows 
+        an image, but you can use the same endpoint for all media formats.
       requestBody:
         content:
           application/json:
@@ -453,8 +459,42 @@ paths:
               example:
                 to: '628987654321'
                 media:
-                  type: audio
-                  url: https://www.soundjay.com/misc/sounds/bell-ringing-05.wav
+                  type: image
+                  url: https://picsum.photos/400/300
+                  caption: Test image from multi-instance API
+              examples:
+                image:
+                  summary: Send Image
+                  value:
+                    to: '628987654321'
+                    media:
+                      type: image
+                      url: https://picsum.photos/400/300
+                      caption: Test image from multi-instance API
+                video:
+                  summary: Send Video
+                  value:
+                    to: '628987654321'
+                    media:
+                      type: video
+                      url: https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4
+                      caption: Test video from multi-instance API
+                document:
+                  summary: Send Document
+                  value:
+                    to: '628987654321'
+                    media:
+                      type: document
+                      url: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+                      filename: test-document.pdf
+                      caption: Test document from multi-instance API
+                audio:
+                  summary: Send Audio
+                  value:
+                    to: '628987654321'
+                    media:
+                      type: audio
+                      url: https://www.soundjay.com/misc/sounds/bell-ringing-05.wav
       parameters:
         - name: Content-Type
           in: header

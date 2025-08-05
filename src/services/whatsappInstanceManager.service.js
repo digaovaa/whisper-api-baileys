@@ -300,8 +300,97 @@ class WhatsAppInstance {
         }
     }
 
+    /**
+     * Safely serialize an object to JSON-compatible format
+     * Converts non-serializable objects like Uint8Array, functions, etc.
+     */
+    safeSerialize(obj) {
+        try {
+            return JSON.parse(JSON.stringify(obj, (key, value) => {
+                // Handle Uint8Array
+                if (value instanceof Uint8Array) {
+                    return {
+                        __type: 'Uint8Array',
+                        data: Array.from(value)
+                    };
+                }
+                
+                // Handle functions
+                if (typeof value === 'function') {
+                    return {
+                        __type: 'Function',
+                        name: value.name || 'anonymous'
+                    };
+                }
+                
+                // Handle Buffer objects
+                if (Buffer.isBuffer(value)) {
+                    return {
+                        __type: 'Buffer',
+                        data: value.toString('base64')
+                    };
+                }
+                
+                // Handle circular references and other complex objects
+                if (value && typeof value === 'object') {
+                    // Check if it's a plain object or array
+                    if (Object.prototype.toString.call(value) === '[object Object]' || Array.isArray(value)) {
+                        return value;
+                    }
+                    // For other object types, convert to string representation
+                    return {
+                        __type: 'ComplexObject',
+                        toString: value.toString()
+                    };
+                }
+                
+                return value;
+            }));
+        } catch (error) {
+            logger.warn(`Failed to serialize object, using fallback: ${error.message}`);
+            // Fallback: return a safe representation
+            return {
+                __serialization_error: true,
+                error: error.message,
+                type: typeof obj,
+                toString: obj?.toString?.() || 'Unable to convert to string'
+            };
+        }
+    }
+
+    /**
+     * Extract timestamp from Baileys Long object or number
+     * @param {*} timestamp - The timestamp from Baileys (can be Long object or number)
+     * @returns {number} - Unix timestamp in seconds
+     */
+    extractTimestamp(timestamp) {
+        if (typeof timestamp === 'number') {
+            return timestamp;
+        }
+        
+        // Handle Long object from Baileys
+        if (timestamp && typeof timestamp === 'object' && ('low' in timestamp || 'high' in timestamp)) {
+            // Convert Long object to number
+            if (timestamp.toNumber && typeof timestamp.toNumber === 'function') {
+                return timestamp.toNumber();
+            }
+            
+            // Manual conversion for Long-like objects
+            const low = timestamp.low || 0;
+            const high = timestamp.high || 0;
+            return high * 0x100000000 + (low >>> 0);
+        }
+        
+        // Fallback to current timestamp if we can't parse it
+        logger.warn(`Unable to parse timestamp: ${JSON.stringify(timestamp)}, using current time`);
+        return Math.floor(Date.now() / 1000);
+    }
+
     async storeMessage(message) {
         try {
+            // Safely serialize the raw message to avoid Prisma serialization errors
+            const safeRawMessage = this.safeSerialize(message);
+            
             const messageData = {
                 instanceId: this.instanceData.id,
                 direction: 'incoming',
@@ -311,14 +400,15 @@ class WhatsAppInstance {
                 message: {
                     content: message.message?.conversation || 
                              message.message?.extendedTextMessage?.text ||
+                             message.message?.imageMessage?.caption ||
                              'Media message',
                     pushName: message.pushName,
                     messageId: message.key.id,
-                    timestamp: message.messageTimestamp,
-                    raw: message
+                    timestamp: this.extractTimestamp(message.messageTimestamp),
+                    raw: safeRawMessage
                 },
                 status: 'received',
-                sentAt: new Date(message.messageTimestamp * 1000)
+                sentAt: new Date(this.extractTimestamp(message.messageTimestamp) * 1000)
             };
 
             await messageService.create(messageData);

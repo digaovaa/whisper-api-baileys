@@ -118,11 +118,40 @@
             display: none;
         }
 
+        /* Desktop and mobile button visibility with maximum specificity */
+        button#desktop-sidebar-toggle.desktop-sidebar-toggle {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            z-index: 1001 !important; /* Higher than header and sidebar */
+            width: auto !important;
+            height: auto !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+        }
+        
+        button#mobile-menu-btn.mobile-menu-btn {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
         @media (max-width: 1024px) {
             .mobile-header {
                 display: flex;
                 justify-content: between;
                 align-items: center;
+            }
+            
+            button#desktop-sidebar-toggle.desktop-sidebar-toggle {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            button#mobile-menu-btn.mobile-menu-btn {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
         }
 
@@ -970,15 +999,22 @@
 
 <body class="bg-gray-50 text-gray-800 font-sans">
     <!-- Mobile Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white shadow-md sticky top-0 z-50" style="z-index: 1000 !important;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
             <div class="flex items-center">
                 <img src="/logo.svg" alt="Whisper API" class="w-8 h-8 mr-3">
                 <h1 class="text-xl font-bold text-gray-800">Whisper API Docs</h1>
             </div>
-            <button id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-indigo-600 focus:outline-none">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
+            <div>
+                <!-- Desktop sidebar toggle button -->
+                <button id="desktop-sidebar-toggle" class="desktop-sidebar-toggle p-2 text-gray-600 hover:text-indigo-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn" class="mobile-menu-btn p-2 text-gray-600 hover:text-indigo-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
         </div>
 
 
@@ -1105,28 +1141,51 @@
     </footer>
 
     <script>
-        // Mobile menu toggle
+        // Get elements
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
         const sidebarClose = document.getElementById('sidebar-close');
         const content = document.getElementById('content');
 
-        function toggleSidebar() {
+        // Mobile sidebar toggle (uses overlay and transforms)
+        function toggleMobileSidebar() {
             sidebar.classList.toggle('open');
             sidebarOverlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
         }
 
-        function closeSidebar() {
+        function closeMobileSidebar() {
             sidebar.classList.remove('open');
             sidebarOverlay.classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        mobileMenuBtn?.addEventListener('click', toggleSidebar);
-        sidebarClose?.addEventListener('click', closeSidebar);
-        sidebarOverlay?.addEventListener('click', closeSidebar);
+        // Desktop sidebar toggle (uses hidden class and full-width content)
+        function toggleDesktopSidebar() {
+            sidebar.classList.toggle('hidden');
+            content.classList.toggle('full-width');
+        }
+
+        // Initialize sidebar state for desktop
+        function initializeSidebar() {
+            if (window.innerWidth > 1024) {
+                // Start with sidebar closed on desktop
+                sidebar.classList.add('hidden');
+                content.classList.add('full-width');
+            } else {
+                // Ensure sidebar starts closed on mobile
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        // Event listeners
+        mobileMenuBtn?.addEventListener('click', toggleMobileSidebar);
+        desktopSidebarToggle?.addEventListener('click', toggleDesktopSidebar);
+        sidebarClose?.addEventListener('click', closeMobileSidebar);
+        sidebarOverlay?.addEventListener('click', closeMobileSidebar);
 
         // Navigation active state
         const navItems = document.querySelectorAll('.nav-item');
@@ -1146,7 +1205,7 @@
 
                     // Close sidebar on mobile after navigation
                     if (window.innerWidth <= 1024) {
-                        closeSidebar();
+                        closeMobileSidebar();
                     }
                 }
             });
@@ -1177,7 +1236,7 @@
         // Responsive sidebar handling
         window.addEventListener('resize', () => {
             if (window.innerWidth > 1024) {
-                closeSidebar();
+                closeMobileSidebar();
             }
         });
 
@@ -1352,7 +1411,7 @@
                         
                         // Close sidebar on mobile
                         if (window.innerWidth <= 1024) {
-                            closeSidebar();
+                            closeMobileSidebar();
                         }
                     }
                 });
@@ -1396,6 +1455,9 @@
 
         // Initialize navigation on page load
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize sidebar state
+            initializeSidebar();
+            
             // Populate overview subnav after content is loaded
             setTimeout(() => {
                 populateOverviewSubnav();

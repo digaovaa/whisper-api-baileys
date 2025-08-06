@@ -1,7 +1,8 @@
 const logger = require('../utils/logger');
 
 const config = {
-    enabled: false
+    enabled: false,
+    description: 'Provides admin commands for WhatsApp groups (!kick, !promote, !demote)'
 };
 
 const adminCommandsPlugin = async ({ props: { enabled = config.enabled, sock, message } }) => {

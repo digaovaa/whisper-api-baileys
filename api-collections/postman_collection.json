@@ -832,6 +832,106 @@
 					]
 				},
 				{
+					"name": "🔌 Plugin Management",
+					"description": "Per-instance plugin configuration endpoints for managing WhatsApp instance plugins",
+					"item": [
+						{
+							"name": "Get Instance Plugin Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "plugins"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enable Plugin",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/plugins/welcome-group/enable",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "plugins", "welcome-group", "enable"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Disable Plugin",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/plugins/welcome-group/disable",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "plugins", "welcome-group", "disable"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Batch Update Plugin Configuration",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"plugins\": {\n    \"welcome-group\": true,\n    \"admin-commands\": false,\n    \"anti-mention\": true,\n    \"eval-command\": false\n  }\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/plugins",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "plugins"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Plugin Configuration from Database",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/instances/{{phone_number}}/plugins/sync",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "instances", "{{phone_number}}", "plugins", "sync"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Global Webhook History (Admin)",
 					"item": [
 						{

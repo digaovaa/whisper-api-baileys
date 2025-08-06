@@ -167,6 +167,44 @@ Content-Type: application/json
 }
 
 #####################
+### INSTANCE-SPECIFIC PLUGIN MANAGEMENT
+#####################
+
+###
+# Get Plugin Configuration for Instance
+GET http://localhost:3000/api/v1/instances/{{phone_number}}/plugins
+Content-Type: application/json
+
+###
+# Enable Plugin for Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/plugins/welcome-group/enable
+Content-Type: application/json
+
+###
+# Disable Plugin for Instance
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/plugins/welcome-group/disable
+Content-Type: application/json
+
+###
+# Batch Update Plugin Configuration for Instance
+PUT http://localhost:3000/api/v1/instances/{{phone_number}}/plugins
+Content-Type: application/json
+
+{
+  "plugins": {
+    "welcome-group": true,
+    "admin-commands": false,
+    "anti-mention": true,
+    "eval-command": false
+  }
+}
+
+###
+# Sync Plugin Configuration from Database
+POST http://localhost:3000/api/v1/instances/{{phone_number}}/plugins/sync
+Content-Type: application/json
+
+#####################
 ### INSTANCE-SPECIFIC WEBHOOKS
 #####################
 

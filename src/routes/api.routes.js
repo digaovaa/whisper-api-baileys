@@ -83,6 +83,13 @@ if (modeConfig.isMultiModeEnabled()) {
     router.get('/instances/:phone/webhooks/history/failures', webhookHistoryController.getInstanceFailuresByPhone);
     router.get('/instances/:phone/webhooks/:webhookId/history', webhookHistoryController.getWebhookHistory);
     
+    // Instance-specific plugin management endpoints
+    router.get('/instances/:phone/plugins', instanceController.getInstancePluginStatus);
+    router.post('/instances/:phone/plugins/:pluginName/enable', instanceController.enableInstancePlugin);
+    router.post('/instances/:phone/plugins/:pluginName/disable', instanceController.disableInstancePlugin);
+    router.put('/instances/:phone/plugins', instanceController.updateInstancePluginConfig);
+    router.post('/instances/:phone/plugins/sync', instanceController.syncInstancePluginConfig);
+    
     // Global webhook history endpoints (admin/monitoring)
     router.get('/webhooks/history', webhookHistoryController.getGlobalHistory);
     router.get('/webhooks/history/stats', webhookHistoryController.getGlobalStatistics);

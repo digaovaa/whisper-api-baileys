@@ -603,6 +603,278 @@ const instanceController = {
                 message: error.message
             });
         }
+    },
+
+    // Get plugin status for instance
+    getInstancePluginStatus: async (req, res) => {
+        try {
+            const { phone } = req.params;
+            logger.info(`🔌 Get plugin status request received for instance ${phone}`);
+            
+            const instance = instanceManager.getInstance(phone);
+            if (!instance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found',
+                    message: `WhatsApp instance ${phone} not found`
+                });
+            }
+            
+            const plugins = instance.pluginManager.getAvailablePlugins();
+            const pluginStatus = instance.pluginManager.getInstancePluginStatus();
+            
+            res.status(200).json({
+                success: true,
+                data: {
+                    phone: phone,
+                    plugins: plugins,
+                    pluginStatus: pluginStatus,
+                    totalPlugins: plugins.length,
+                    enabledPlugins: plugins.filter(p => p.enabled).length
+                },
+                message: `Plugin status retrieved for instance ${phone}`
+            });
+            
+        } catch (error) {
+            logger.error(`❌ Error getting plugin status for instance ${req.params.phone}:`, error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get plugin status',
+                message: error.message
+            });
+        }
+    },
+
+    // Enable plugin for instance
+    enableInstancePlugin: async (req, res) => {
+        try {
+            const { phone, pluginName } = req.params;
+            logger.info(`✅ Enable plugin request received for instance ${phone}, plugin: ${pluginName}`);
+            
+            const instance = instanceManager.getInstance(phone);
+            if (!instance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found',
+                    message: `WhatsApp instance ${phone} not found`
+                });
+            }
+            
+            try {
+                const updatedConfig = instance.pluginManager.enableInstancePlugin(pluginName);
+                
+                // Update database with new plugin configuration
+                const dbInstance = await instanceService.findByPhone(phone);
+                if (dbInstance) {
+                    const updatedDbInstance = await instanceService.update(dbInstance.id, {
+                        pluginConfig: JSON.stringify(updatedConfig)
+                    });
+                    
+                    // Update in-memory instance data
+                    instance.instanceData = updatedDbInstance;
+                }
+                
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        phone: phone,
+                        pluginName: pluginName,
+                        enabled: true,
+                        pluginConfig: updatedConfig
+                    },
+                    message: `Plugin ${pluginName} enabled for instance ${phone}`
+                });
+                
+            } catch (pluginError) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Plugin not found',
+                    message: pluginError.message
+                });
+            }
+            
+        } catch (error) {
+            logger.error(`❌ Error enabling plugin for instance ${req.params.phone}:`, error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to enable plugin',
+                message: error.message
+            });
+        }
+    },
+
+    // Disable plugin for instance
+    disableInstancePlugin: async (req, res) => {
+        try {
+            const { phone, pluginName } = req.params;
+            logger.info(`❌ Disable plugin request received for instance ${phone}, plugin: ${pluginName}`);
+            
+            const instance = instanceManager.getInstance(phone);
+            if (!instance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found',
+                    message: `WhatsApp instance ${phone} not found`
+                });
+            }
+            
+            try {
+                const updatedConfig = instance.pluginManager.disableInstancePlugin(pluginName);
+                
+                // Update database with new plugin configuration
+                const dbInstance = await instanceService.findByPhone(phone);
+                if (dbInstance) {
+                    const updatedDbInstance = await instanceService.update(dbInstance.id, {
+                        pluginConfig: JSON.stringify(updatedConfig)
+                    });
+                    
+                    // Update in-memory instance data
+                    instance.instanceData = updatedDbInstance;
+                }
+                
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        phone: phone,
+                        pluginName: pluginName,
+                        enabled: false,
+                        pluginConfig: updatedConfig
+                    },
+                    message: `Plugin ${pluginName} disabled for instance ${phone}`
+                });
+                
+            } catch (pluginError) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Plugin not found',
+                    message: pluginError.message
+                });
+            }
+            
+        } catch (error) {
+            logger.error(`❌ Error disabling plugin for instance ${req.params.phone}:`, error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to disable plugin',
+                message: error.message
+            });
+        }
+    },
+
+    // Update multiple plugin settings for instance
+    updateInstancePluginConfig: async (req, res) => {
+        try {
+            const { phone } = req.params;
+            const { plugins } = req.body;
+            
+            logger.info(`🔄 Update plugin config request received for instance ${phone}`);
+            
+            if (!plugins || typeof plugins !== 'object') {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid request body',
+                    message: 'plugins object is required'
+                });
+            }
+            
+            const instance = instanceManager.getInstance(phone);
+            if (!instance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found',
+                    message: `WhatsApp instance ${phone} not found`
+                });
+            }
+            
+            const updatedConfig = instance.pluginManager.setInstancePluginConfig(plugins);
+            
+            // Update database with new plugin configuration
+            const dbInstance = await instanceService.findByPhone(phone);
+            if (dbInstance) {
+                const updatedDbInstance = await instanceService.update(dbInstance.id, {
+                    pluginConfig: JSON.stringify(updatedConfig)
+                });
+                
+                // Update in-memory instance data
+                instance.instanceData = updatedDbInstance;
+            }
+            
+            const availablePlugins = instance.pluginManager.getAvailablePlugins();
+            
+            res.status(200).json({
+                success: true,
+                data: {
+                    phone: phone,
+                    pluginConfig: updatedConfig,
+                    plugins: availablePlugins,
+                    enabledPlugins: availablePlugins.filter(p => p.enabled).length,
+                    totalPlugins: availablePlugins.length
+                },
+                message: `Plugin configuration updated for instance ${phone}`
+            });
+            
+        } catch (error) {
+            logger.error(`❌ Error updating plugin config for instance ${req.params.phone}:`, error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to update plugin configuration',
+                message: error.message
+            });
+        }
+    },
+
+    // Sync plugin configuration from database
+    syncInstancePluginConfig: async (req, res) => {
+        try {
+            const { phone } = req.params;
+            logger.info(`🔄 Sync plugin config request received for instance ${phone}`);
+            
+            const instance = instanceManager.getInstance(phone);
+            if (!instance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found',
+                    message: `WhatsApp instance ${phone} not found`
+                });
+            }
+            
+            // Get fresh data from database
+            const dbInstance = await instanceService.findByPhone(phone);
+            if (!dbInstance) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Instance not found in database',
+                    message: `Database record for ${phone} not found`
+                });
+            }
+            
+            // Sync plugin configuration from database
+            const synced = instance.pluginManager.syncPluginConfigFromDatabase(dbInstance);
+            const availablePlugins = instance.pluginManager.getAvailablePlugins();
+            
+            res.status(200).json({
+                success: true,
+                data: {
+                    phone: phone,
+                    synced: synced,
+                    pluginConfig: dbInstance.pluginConfig,
+                    plugins: availablePlugins,
+                    enabledPlugins: availablePlugins.filter(p => p.enabled).length,
+                    totalPlugins: availablePlugins.length
+                },
+                message: synced ? 
+                    `Plugin configuration synced from database for instance ${phone}` :
+                    `No plugin configuration changes detected for instance ${phone}`
+            });
+            
+        } catch (error) {
+            logger.error(`❌ Error syncing plugin config for instance ${req.params.phone}:`, error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to sync plugin configuration',
+                message: error.message
+            });
+        }
     }
 };
 

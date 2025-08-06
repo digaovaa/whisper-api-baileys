@@ -20,6 +20,7 @@
 - 👥 **Send Group Message** - Send messages to WhatsApp groups
 - 🔗 **Webhooks** - Real-time event notifications via HTTP webhooks
 - 🏢 **Multi-Instance** - Manage multiple WhatsApp instances simultaneously
+- 🔌 **Plugin Management** - Per-instance plugin configuration and control
 - 📋 **Logging** - Comprehensive logging for all activities
 - 🔧 **Modular Structure** - Clean, maintainable, and scalable code structure
 
@@ -75,7 +76,7 @@ The API supports multiple operational modes:
 Key endpoint categories:
 - 🌐 **Global Endpoints**: Mode information and system status
 - 🔀 **Single Instance (Legacy)**: Basic WhatsApp messaging functionality
-- 🏢 **Multi-Instance Management**: Instance creation, monitoring, messaging, and webhook management
+- 🏢 **Multi-Instance Management**: Instance creation, monitoring, messaging, webhook management, and plugin configuration
 
 ## First Time Setup
 

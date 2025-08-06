@@ -1,7 +1,8 @@
 const logger = require('../utils/logger');
 
 const config = {
-    enabled: true
+    enabled: true,
+    description: 'Welcomes new members to WhatsApp groups with a scheduled message after 5 minutes'
 };
 
 // Store participants for each group to batch welcome messages

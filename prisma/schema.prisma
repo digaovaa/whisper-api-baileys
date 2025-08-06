@@ -12,13 +12,14 @@ datasource db {
 }
 
 model Instance {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  phone     String   @unique
-  name      String
-  alias     String?
-  status    String   @default("inactive")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone        String   @unique
+  name         String
+  alias        String?
+  status       String   @default("inactive")
+  pluginConfig Json?    @default("{}") @map("plugin_config")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
   webhooks        Webhook[]

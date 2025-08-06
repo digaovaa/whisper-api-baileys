@@ -25,7 +25,7 @@ class WhatsAppInstance {
         this.connectionStatus = 'disconnected';
         this.qrCode = null;
         this.authDir = path.join(__dirname, `../../auth/${instanceData.phone}`);
-        this.pluginManager = new PluginManager();
+        this.pluginManager = new PluginManager(instanceData);
         this.groupMetadataCache = new Map();
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
@@ -259,6 +259,41 @@ class WhatsAppInstance {
         this.sock.ev.on('creds.update', saveCreds);
         this.sock.ev.on('messages.upsert', this.handleMessagesUpsert.bind(this));
         this.sock.ev.on('group-participants.update', this.handleGroupUpdate.bind(this));
+        
+        // Add error handling for Baileys internal errors (like MAC errors)
+        this.sock.ev.on('CB:call', (callUpdate) => {
+            // Handle call updates if needed
+        });
+        
+        // Handle stream errors and message decryption failures
+        this.sock.ws.on('error', (error) => {
+            logger.warn(`WebSocket error for ${this.instanceData.phone}: ${error.message}`);
+        });
+        
+        // Override console.error to catch Baileys internal errors
+        const originalConsoleError = console.error;
+        console.error = (...args) => {
+            const errorString = args.join(' ');
+            
+            // Check for MAC errors and other Baileys-related errors
+            if (errorString.includes('Bad MAC') || 
+                errorString.includes('failed to decrypt message') ||
+                errorString.includes('Session error')) {
+                
+                logger.warn(`[Baileys MAC Error Handled] ${errorString}`);
+                // Don't crash the application - just log and continue
+                return;
+            }
+            
+            // Check for stream errors
+            if (errorString.includes('stream errored out')) {
+                logger.warn(`[Baileys Stream Error] ${errorString}`);
+                return;
+            }
+            
+            // Call original console.error for other errors
+            originalConsoleError.apply(console, args);
+        };
     }
 
     async handleGroupUpdate(update) {

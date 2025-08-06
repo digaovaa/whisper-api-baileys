@@ -2,7 +2,8 @@ const logger = require('../utils/logger');
 const packageJson = require('../../package.json');
 
 const config = {
-    enabled: true
+    enabled: true,
+    description: 'Automatically kicks users who spam mention groups in specified WhatsApp groups'
 };
 
 const antiMentionPlugin = async ({ props: { enabled = config.enabled, sock, message } }) => {

@@ -16,6 +16,7 @@ class InstanceService {
         name: data.name,
         alias: data.alias,
         status: data.status || 'inactive',
+        pluginConfig: data.pluginConfig || {},
       },
     });
   }

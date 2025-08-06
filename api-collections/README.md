@@ -29,8 +29,8 @@ The API supports three operational modes configured via the `WHATSAPP_MODE` envi
 - **Test Files**: `global/` + `single-instance/`
 
 ### 2. Multi-Instance Mode (`WHATSAPP_MODE=multi`) - Default
-- **Endpoints Available**: Global + Multi-Instance
-- **Use Case**: Managing multiple WhatsApp instances
+- **Endpoints Available**: Global + Multi-Instance (including plugin management)
+- **Use Case**: Managing multiple WhatsApp instances with per-instance plugin configuration
 - **Test Files**: `global/` + `multi-instance/`
 
 ### 3. Hybrid Mode (`WHATSAPP_MODE=both`)
@@ -73,7 +73,7 @@ GET http://localhost:3000/api/v1/mode
 2. The collection includes:
    - 🌐 Global Endpoints (available in all modes)
    - 🔀 Single Instance (Legacy) endpoints
-   - 🏢 Multi-Instance Management endpoints
+   - 🏢 Multi-Instance Management endpoints (including 🔌 Plugin Management)
 3. Set up the environment variables (`base_url`, `phone_number`, etc.)
 4. The collection automatically organizes requests by operational mode
 

@@ -4,7 +4,8 @@ const {
     useMultiFileAuthState,
     fetchLatestBaileysVersion
 } = require('baileys');
-const qrcode = require('qrcode-terminal');
+const qrcodeTerminal = require('qrcode-terminal');
+const qrcode = require('qrcode');
 const logger = require('../utils/logger');
 const path = require('path');
 const fs = require('fs');
@@ -131,15 +132,17 @@ class WhatsAppInstance {
                 this.qrCode = qr;
                 logger.info(`📱 QR Code generated for ${this.instanceData.phone}. Scan to connect.`);
                 if (process.env.NODE_ENV === 'development') {
-                    qrcode.generate(qr, { small: true });
+                    qrcodeTerminal.generate(qr, { small: true });
                 }
                 this.connectionStatus = 'qr_ready';
                 await instanceService.updateStatus(this.instanceData.id, 'qr_ready');
                 
+                const qrCodeImage = await qrcode.toDataURL(qr);
                 // Trigger webhook for QR code generation
                 await this.triggerWebhooks('connection.update', {
                     status: 'qr_ready',
                     qrCode: qr,
+                    qrCodeImage: qrCodeImage, 
                     instance: this.instanceData,
                     timestamp: new Date().toISOString(),
                     message: 'QR Code generated. Scan to connect.'
@@ -825,7 +828,8 @@ class WhatsAppInstance {
         await instanceService.updateStatus(this.instanceData.id, 'inactive');
     }
 
-    getStatus() {
+    async getStatus() {
+        const qrCodeImage = this.qrCode ? await qrcode.toDataURL(this.qrCode) : null;
         return {
             instanceId: this.instanceData.id,
             phone: this.instanceData.phone,
@@ -834,6 +838,7 @@ class WhatsAppInstance {
             isConnected: this.isConnected,
             connectionStatus: this.connectionStatus,
             qrCode: this.qrCode,
+            qrCodeImage: qrCodeImage,
             reconnectAttempts: this.reconnectAttempts,
             timestamp: new Date().toISOString()
         };
@@ -932,14 +937,18 @@ class WhatsAppInstanceManager {
         return this.instances.get(phone);
     }
 
-    getAllInstances() {
-        return Array.from(this.instances.values()).map(instance => instance.getStatus());
+    async getAllInstances() {
+        const statuses = await Promise.all(
+            Array.from(this.instances.values()).map(instance => instance.getStatus())
+        );
+        return statuses;
     }
 
     async getInstanceByPhone(phone) {
         const instance = this.instances.get(phone);
         if (instance) {
-            return instance.getStatus();
+            const statuses = await instance.getStatus();
+            return statuses;
         }
 
         // Try to get from database
@@ -1001,12 +1010,13 @@ class WhatsAppInstanceManager {
         return { success: true, message: 'Instance restarted successfully' };
     }
 
-    getManagerStatus() {
+    async getManagerStatus() {
+        const statuses = await this.getAllInstances();
         return {
             initialized: this.initialized,
             totalInstances: this.instances.size,
             connectedInstances: Array.from(this.instances.values()).filter(i => i.isConnected).length,
-            instances: this.getAllInstances()
+            instances: statuses
         };
     }
 }

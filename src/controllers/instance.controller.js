@@ -118,7 +118,7 @@ const instanceController = {
 
             res.status(200).json({
                 success: true,
-                data: instance.getStatus(),
+                data: await instance.getStatus(),
                 message: `Status of instance ${phone}`
             });
         } catch (error) {
@@ -136,8 +136,8 @@ const instanceController = {
         try {
             logger.info('📋 Get all instances request received');
             
-            const instances = instanceManager.getAllInstances();
-            const managerStatus = instanceManager.getManagerStatus();
+            const instances = await instanceManager.getAllInstances();
+            const managerStatus = await instanceManager.getManagerStatus();
             
             res.status(200).json({
                 success: true,
@@ -347,7 +347,7 @@ const instanceController = {
                 });
             }
             
-            const status = instance.getStatus();
+            const status = await instance.getStatus();
             
             if (!status.qrCode) {
                 return res.status(400).json({
@@ -361,6 +361,7 @@ const instanceController = {
                 success: true,
                 data: {
                     qrCode: status.qrCode,
+                    qrCodeImage: status.qrCodeImage,
                     connectionStatus: status.connectionStatus,
                     timestamp: status.timestamp
                 }

@@ -1,0 +1,124 @@
+name: whisp-bot — Close Inactive Issues
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    env:
+      BOT_NAME: 'whisp-bot'
+      DAYS: '2'
+      DRY_RUN: 'true'
+      CHECK_LAST_COMMENT: 'true'
+      LABEL_ON_CLOSE: 'auto-closed-by-whisp'
+      ADD_COMMENT_ON_CLOSE: |
+        This issue is being auto-closed due to inactivity.
+        If you think this is a mistake, please reopen or comment.
+        
+        — whisp-bot
+
+    steps:
+      - name: Close inactive issues (script)
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const botName = (process.env.BOT_NAME || context.actor);
+            const days = parseInt(process.env.DAYS || '2', 10);
+            const dryRun = (process.env.DRY_RUN || 'true') === 'true';
+            const checkLastComment = (process.env.CHECK_LAST_COMMENT || 'false') === 'true';
+            const labelOnClose = (process.env.LABEL_ON_CLOSE || '').trim();
+            let closeComment = (process.env.ADD_COMMENT_ON_CLOSE || '').trim();
+
+            if (closeComment && !closeComment.includes(botName)) {
+              closeComment += `\n\n— ${botName}`;
+            }
+
+            const now = new Date();
+            const thresholdMillis = days * 24 * 60 * 60 * 1000;
+
+            const items = await github.paginate(
+              github.issues.listForRepo,
+              { owner, repo, state: 'open', per_page: 100 }
+            );
+            console.log(`[${botName}] Found ${items.length} open items (includes PRs).`);
+
+            let examined = 0;
+            const closed = [];
+            const skipped = [];
+            const errors = [];
+
+            for (const issue of items) {
+              try {
+                if (issue.pull_request) {
+                  skipped.push({ number: issue.number, reason: 'pull_request' });
+                  continue;
+                }
+
+                examined++;
+
+                let lastActivity = new Date(issue.updated_at);
+
+                if (checkLastComment && issue.comments > 0) {
+                  const lastPage = Math.max(1, Math.ceil(issue.comments / 1));
+                  const commentsResp = await github.issues.listComments({
+                    owner, repo, issue_number: issue.number, per_page: 1, page: lastPage
+                  });
+                  const comments = commentsResp.data || [];
+                  if (comments.length > 0) {
+                    lastActivity = new Date(comments[comments.length - 1].created_at);
+                  }
+                }
+
+                const age = now - lastActivity;
+
+                if (age <= thresholdMillis) {
+                  skipped.push({ number: issue.number, reason: `recent activity (${lastActivity.toISOString()})` });
+                  continue;
+                }
+
+                console.log(`${dryRun ? '[DRY-RUN]' : '[ACTION]'} [${botName}] Issue #${issue.number} will be closed. lastActivity=${lastActivity.toISOString()}, comments=${issue.comments}`);
+
+                if (!dryRun) {
+                  if (labelOnClose) {
+                    try {
+                      await github.issues.addLabels({ owner, repo, issue_number: issue.number, labels: [labelOnClose] });
+                    } catch (e) {
+                      console.warn(`[${botName}] Warning: failed to add label to #${issue.number}: ${e.message}`);
+                    }
+                  }
+
+                  if (closeComment) {
+                    try {
+                      await github.issues.createComment({ owner, repo, issue_number: issue.number, body: closeComment });
+                    } catch (e) {
+                      console.warn(`[${botName}] Warning: failed to add comment to #${issue.number}: ${e.message}`);
+                    }
+                  }
+
+                  await github.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+                }
+
+                closed.push(issue.number);
+
+              } catch (err) {
+                console.error(`[${botName}] Error processing #${issue.number}: ${err.message}`);
+                errors.push({ number: issue.number, message: err.message });
+              }
+            }
+
+            console.log('--- SUMMARY ---');
+            console.log(`[${botName}] Examined issues: ${examined}`);
+            console.log(`[${botName}] Closed (${closed.length}): ${closed.join(', ') || '-'}`);
+            console.log(`[${botName}] Skipped (${skipped.length}): ${skipped.map(s => `#${s.number}(${s.reason})`).join(', ') || '-'}`);
+            if (errors.length) {
+              console.log(`[${botName}] Errors (${errors.length}): ${errors.map(e => `#${e.number}: ${e.message}`).join(' | ')}`);
+            }
+            console.log(dryRun ? `[${botName}] DRY-RUN mode — no changes were made.` : `[${botName}] Finished — real changes were applied.`);

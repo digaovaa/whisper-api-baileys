@@ -14,7 +14,7 @@ jobs:
     env:
       BOT_NAME: 'whisp-bot'
       DAYS: '2'
-      DRY_RUN: 'true'
+      DRY_RUN: 'false'
       CHECK_LAST_COMMENT: 'true'
       LABEL_ON_CLOSE: 'auto-closed-by-whisp'
       ADD_COMMENT_ON_CLOSE: |
